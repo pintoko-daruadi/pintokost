@@ -28,7 +28,7 @@ class Rent(models.Model):
 	active = models.BooleanField('Status Sewa Aktif', default=True)
 
 	def __str__(self):
-		return "%s (%s) - %saktif" % (self.house.name, self.renter.username, ('' if self.active else 'tidak '))
+		return "%s (%s) - %saktif" % (self.house.name, self.renter.user.username, ('' if self.active else 'tidak '))
 
 
 class Payment(models.Model):
@@ -38,7 +38,7 @@ class Payment(models.Model):
 	end = models.DateField('Akhir Sewa')
 
 	def __str__(self):
-		return "[%s - %s] %s" % (self.rent.house.name, self.start.strftime("%B"), self.rent.renter.username)
+		return "[%s - %s] %s" % (self.rent.house.name, self.start.strftime("%B"), self.rent.renter.user.username)
 
 class Expense(models.Model):
 	house = models.ForeignKey(House, on_delete=models.PROTECT)

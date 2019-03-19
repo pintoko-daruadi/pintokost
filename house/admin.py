@@ -10,22 +10,23 @@ admin.site.register(House, HouseAdmin)
 class RentAdmin(admin.ModelAdmin):
 	list_display = ('house', 'penyewa', 'price', 'active')
 	def penyewa(self, model_obj):
-		return "%s %s" % (model_obj.renter.first_name, model_obj.renter.last_name)
+		return "%s %s" % (model_obj.renter.user.first_name, model_obj.renter.user.last_name)
 	def formfield_for_foreignkey(self, db_field, request, **kwargs):
 		if db_field.name == 'price':
-			kwargs['initial'] = [Price.objects.filter(active=True)]
+			kwargs['initial'] = (('', '---------'),) + tuple(Price.objects.filter(active=True))
 			return db_field.formfield(**kwargs)
 		return super(RentAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 admin.site.register(Rent, RentAdmin)
 
 class PaymentAdmin(admin.ModelAdmin):
-	list_display = ('rumah', 'penyewa', 'harga', 'pay_date', 'start', 'end')
+	list_display = ('rumah', 'pay_date', 'start', 'end', 'harga', 'penyewa')
+	ordering = ('-start',)
 	def rumah(self, model_obj):
 		return "%s" % model_obj.rent.house
 	def harga(self, model_obj):
 		return "%s" % model_obj.rent.price
 	def penyewa(self, model_obj):
-		return "%s %s" % (model_obj.rent.renter.first_name, model_obj.rent.renter.last_name)
+		return "%s %s" % (model_obj.rent.renter.user.first_name, model_obj.rent.renter.user.last_name)
 admin.site.register(Payment, PaymentAdmin)
 
 class ExpenseAdmin(admin.ModelAdmin):
