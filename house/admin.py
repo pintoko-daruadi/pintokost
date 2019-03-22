@@ -19,14 +19,14 @@ class RentAdmin(admin.ModelAdmin):
 admin.site.register(Rent, RentAdmin)
 
 class PaymentAdmin(admin.ModelAdmin):
-	list_display = ('rumah', 'pay_date', 'start', 'end', 'harga', 'penyewa')
-	ordering = ('-start',)
-	def rumah(self, model_obj):
-		return "%s" % model_obj.rent.house
+	list_display = ('house_name', 'pay_date', 'start', 'harga', 'penyewa', 'pemilik')
+	ordering = ('rent',)
 	def harga(self, model_obj):
 		return "%s" % model_obj.rent.price
 	def penyewa(self, model_obj):
 		return "%s %s" % (model_obj.rent.renter.user.first_name, model_obj.rent.renter.user.last_name)
+	def pemilik(self, model_obj):
+		return "%s %s" % (model_obj.rent.house.owner.user.first_name, model_obj.rent.house.owner.user.last_name)
 admin.site.register(Payment, PaymentAdmin)
 
 class ExpenseAdmin(admin.ModelAdmin):
@@ -37,9 +37,8 @@ class ExpenseAdmin(admin.ModelAdmin):
 admin.site.register(Expense, ExpenseAdmin)
 
 class PriceAdmin(admin.ModelAdmin):
-	list_display = ('harga', 'active')
-	def harga(self, model_obj):
-		return toRupiah(model_obj.nominal)
+	list_display = ('get_formated_nominal', 'active')
+	ordering = ('nominal',)
 admin.site.register(Price, PriceAdmin)
 
 admin.site.site_header = "Pintoko Rent House"
