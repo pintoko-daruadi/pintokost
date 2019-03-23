@@ -5,40 +5,94 @@ from .helpers import *
 # Register your models here.
 class HouseAdmin(admin.ModelAdmin):
 	list_display = ('name', 'pln_number', 'address', 'owner')
+
+	def get_queryset(self, request):
+		qs = super().get_queryset(request)
+		if request.user.is_superuser:
+			return qs
+		return qs.filter(owner__user = request.user)
+
 admin.site.register(House, HouseAdmin)
 
 class RentAdmin(admin.ModelAdmin):
-	list_display = ('house', 'penyewa', 'price', 'active')
+	list_display = ('house', 'penyewa', 'price', 'active', 'owner')
+
 	def penyewa(self, model_obj):
-		return "%s %s" % (model_obj.renter.user.first_name, model_obj.renter.user.last_name)
+		return "%s %s (%s)" % (model_obj.renter.user.first_name, model_obj.renter.user.last_name, model_obj.renter.phone)
+
 	def formfield_for_foreignkey(self, db_field, request, **kwargs):
 		if db_field.name == 'price':
-			kwargs['initial'] = (('', '---------'),) + tuple(Price.objects.filter(active=True))
+			kwargs['queryset'] = Price.objects.filter(active=True)
 			return db_field.formfield(**kwargs)
-		return super(RentAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+		elif db_field.name == 'house' and not request.user.is_superuser:
+			kwargs['queryset'] = House.objects.filter(owner__user=request.user)
+		return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+	def owner(self, model_obj):
+		return "%s %s (%s)" % (model_obj.house.owner.user.first_name, model_obj.house.owner.user.last_name, model_obj.renter.phone)
+
+	def get_queryset(self, request):
+		qs = super().get_queryset(request)
+		if request.user.is_superuser:
+			return qs
+		return qs.filter(house__owner__user = request.user)
+
 admin.site.register(Rent, RentAdmin)
 
 class PaymentAdmin(admin.ModelAdmin):
-	list_display = ('house_name', 'pay_date', 'start', 'harga', 'penyewa', 'pemilik')
+	list_display = ('house_name', 'pay_date', 'start', 'harga', 'penyewa', 'owner')
 	ordering = ('rent',)
 	def harga(self, model_obj):
 		return "%s" % model_obj.rent.price
 	def penyewa(self, model_obj):
 		return "%s %s" % (model_obj.rent.renter.user.first_name, model_obj.rent.renter.user.last_name)
-	def pemilik(self, model_obj):
-		return "%s %s" % (model_obj.rent.house.owner.user.first_name, model_obj.rent.house.owner.user.last_name)
+	def owner(self, model_obj):
+		return "%s %s (%s)" % (model_obj.rent.house.owner.user.first_name, model_obj.rent.house.owner.user.last_name, model_obj.rent.house.owner.phone)
+
+	def get_queryset(self, request):
+		qs = super().get_queryset(request)
+		if request.user.is_superuser:
+			return qs
+		return qs.filter(rent__house__owner__user = request.user)
+
+	def house_name(self, model_obj):
+		return model_obj.rent.house
+	house_name.short_description = 'Rumah'
+	house_name.admin_order_field = 'rent'
+
 admin.site.register(Payment, PaymentAdmin)
 
 class ExpenseAdmin(admin.ModelAdmin):
-	list_display = ('house', 'remark', 'date', 'biaya', 'receipt_number')
-	def biaya(self, model_obj):
+	list_display = ('house', 'remark', 'date', 'get_formated_nominal', 'receipt_number')
+
+	def get_queryset(self, request):
+		qs = super().get_queryset(request)
+		if request.user.is_superuser:
+			return qs
+		return qs.filter(house__owner__user = request.user)
+
+	def get_formated_nominal(self, model_obj):
 		return toRupiah(model_obj.nominal)
+
+	def formfield_for_foreignkey(self, db_field, request, **kwargs):
+		if db_field.name == 'house' and not request.user.is_superuser:
+			kwargs['queryset'] = House.objects.filter(owner__user=request.user)
+		return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+	get_formated_nominal.short_description = 'Biaya'
+	get_formated_nominal.admin_order_field = '-nominal'
 
 admin.site.register(Expense, ExpenseAdmin)
 
 class PriceAdmin(admin.ModelAdmin):
 	list_display = ('get_formated_nominal', 'active')
 	ordering = ('nominal',)
+
+	def get_formated_nominal(self, obj):
+		return toRupiah(obj.nominal)
+	get_formated_nominal.short_description = 'Harga Sewa'
+	get_formated_nominal.admin_order_field = '-nominal'
+
 admin.site.register(Price, PriceAdmin)
 
 admin.site.site_header = "Pintoko Rent House"
