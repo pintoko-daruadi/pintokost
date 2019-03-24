@@ -26,6 +26,7 @@ class Rent(models.Model):
 	renter = models.ForeignKey(Renter, on_delete=models.PROTECT, verbose_name='Penyewa')
 	price = models.ForeignKey(Price, on_delete=models.PROTECT, verbose_name='Harga', default=None)
 	active = models.BooleanField('Status Sewa Aktif', default=True)
+	billing_date = models.DateField('Tanggal Tagihan', default=None)
 
 	def __str__(self):
 		return "%s (%s/%s) - %saktif" % (self.house.name, self.renter.user.username, self.price, ('' if self.active else 'tidak '))
@@ -34,7 +35,6 @@ class Payment(models.Model):
 	rent = models.ForeignKey(Rent, on_delete=models.PROTECT)
 	pay_date = models.DateField('Tanggal Bayar', default=None)
 	start = models.DateField('Mulai Sewa')
-	end = models.DateField('Akhir Sewa')
 
 	def __str__(self):
 		return "%s/%s (%s)" % (self.rent.house.name, self.start.strftime("%B"), self.rent.renter.user.username)
