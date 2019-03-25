@@ -14,7 +14,7 @@ class Renter(models.Model):
 		('SIM', 'SIM - Surat Ijin Mengemudi'),
 		('KTM', 'KTM - Kartu Tanda Mahasiswa'),
 	)
-	user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, verbose_name='Username Penyewa', default=None)
+	user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, verbose_name='Username', default=None)
 	identity_type = models.CharField('Jenis Identitas', max_length=3, choices=IDENTITY_TYPES)
 	identity_number = models.CharField('Nomor Identitas', max_length=50)
 	dob = models.DateField('Tanggal Lahir')
@@ -35,7 +35,7 @@ class Owner(models.Model):
 		('KTP', 'KTP - Kartu Tanda Penduduk'),
 		('SIM', 'SIM - Surat Ijin Mengemudi'),
 	)
-	user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, verbose_name='Username Pemilik', default=None)
+	user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, verbose_name='Username', default=None)
 	identity_type = models.CharField('Jenis Identitas', max_length=3, choices=IDENTITY_TYPES)
 	identity_number = models.CharField('Nomor Identitas', max_length=50)
 	dob = models.DateField('Tanggal Lahir')
