@@ -14,25 +14,19 @@ class House(models.Model):
 	def __str__(self):
 		return self.name 
 
-class Price(models.Model):
-	nominal = models.PositiveIntegerField('Harga Sewa')
-	active = models.BooleanField('Status Harga Aktif', default=True)
-
-	def __str__(self):
-		return "%s" % toRupiah(self.nominal)
-
 class Rent(models.Model):
 	house = models.ForeignKey(House, on_delete=models.PROTECT, verbose_name='Rumah')
 	renter = models.ForeignKey(Renter, on_delete=models.PROTECT, verbose_name='Penyewa')
-	price = models.ForeignKey(Price, on_delete=models.PROTECT, verbose_name='Harga', default=None)
-	active = models.BooleanField('Status Sewa Aktif', default=True)
+	price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name='Harga')
 	billing_date = models.DateField('Tanggal Tagihan', default=None)
+	active = models.BooleanField('Status Sewa Aktif', default=True)
 
 	def __str__(self):
-		return "%s (%s/%s) - %saktif" % (self.house.name, self.renter.user.username, self.price, ('' if self.active else 'tidak '))
+		return "%s / %s <%s>" % (self.house.name, self.renter.user.username, toRupiah(self.price))
 
 class Payment(models.Model):
 	rent = models.ForeignKey(Rent, on_delete=models.PROTECT)
+	price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name='Harga')
 	pay_date = models.DateField('Tanggal Bayar', default=None)
 	start = models.DateField('Mulai Sewa')
 

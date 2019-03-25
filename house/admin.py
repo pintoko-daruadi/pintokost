@@ -3,7 +3,7 @@ from .models import *
 from .helpers import *
 
 class ExpenseAdmin(admin.ModelAdmin):
-	list_display = ('house', 'remark', 'date', 'get_formated_nominal', 'receipt_number')
+	list_display = ('house', 'owner', 'remark', 'date', 'get_formated_nominal', 'receipt_number')
 
 	def get_queryset(self, request):
 		qs = super().get_queryset(request)
@@ -11,8 +11,11 @@ class ExpenseAdmin(admin.ModelAdmin):
 			return qs
 		return qs.filter(house__owner__user = request.user)
 
-	def get_formated_nominal(self, model_obj):
-		return toRupiah(model_obj.nominal)
+	def get_formated_nominal(self, obj):
+		return toRupiah(obj.nominal)
+
+	def owner(self, obj):
+		return obj.house.owner
 
 	def formfield_for_foreignkey(self, db_field, request, **kwargs):
 		if db_field.name == 'house' and not request.user.is_superuser:
@@ -45,24 +48,24 @@ class HouseAdmin(admin.ModelAdmin):
 admin.site.register(House, HouseAdmin)
 
 class PaymentAdmin(admin.ModelAdmin):
-	list_display = ('house_name', 'billing_date', 'pay_date', 'start', 'harga', 'penyewa', 'owner')
-	ordering = ('rent',)
+	list_display = ('house_name', 'start', 'billing_date', 'pay_date', 'harga', 'penyewa', 'owner')
+	ordering = ('-start', 'pay_date')
+	readonly_fields = ('price',)
+	fields = ('rent', 'price', 'pay_date', 'start')
 
-	def billing_date(self, model_obj):
-		return model_obj.rent.billing_date
+	def billing_date(self, obj):
+		return "%s" % obj.rent.billing_date.strftime("%d")
 	billing_date.short_description = 'Tanggal Tagihan'
 
-	def harga(self, model_obj):
-		return "%s" % model_obj.rent.price
+	def penyewa(self, obj):
+		return "%s %s (%s)" % (obj.rent.renter.user.first_name, obj.rent.renter.user.last_name, obj.rent.renter.phone)
 
-	harga.short_description = 'Harga'
-	harga.admin_order_field = 'rent__price'
+	def owner(self, obj):
+		return "%s %s (%s)" % (obj.rent.house.owner.user.first_name, obj.rent.house.owner.user.last_name, obj.rent.house.owner.phone)
 
-	def penyewa(self, model_obj):
-		return "%s %s" % (model_obj.rent.renter.user.first_name, model_obj.rent.renter.user.last_name)
-
-	def owner(self, model_obj):
-		return "%s %s (%s)" % (model_obj.rent.house.owner.user.first_name, model_obj.rent.house.owner.user.last_name, model_obj.rent.house.owner.phone)
+	def harga(self, obj):
+		return "%s" % toRupiah(obj.price)
+	harga.admin_order_field = 'price'
 
 	def get_queryset(self, request):
 		qs = super().get_queryset(request)
@@ -70,53 +73,53 @@ class PaymentAdmin(admin.ModelAdmin):
 			return qs.filter(rent__house__owner__user = request.user)
 		return qs
 
-	def house_name(self, model_obj):
-		return model_obj.rent.house
-
+	def house_name(self, obj):
+		return obj.rent.house
 	house_name.short_description = 'Rumah'
-	house_name.admin_order_field = 'rent'
+	house_name.admin_order_field = 'rent__house__name'
+
+	def save_model(self, request, obj, form, change):
+		obj.price = obj.rent.price
+		super().save_model(request, obj, form, change)
 
 	def formfield_for_foreignkey(self, db_field, request, **kwargs):
 		if db_field.name == 'rent' and not request.user.is_superuser:
-			kwargs['queryset'] = Rent.objects.filter(house__owner__user=request.user)
+			kwargs['queryset'] = Rent.objects.filter(house__owner__user=request.user, active=True)
 		return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 admin.site.register(Payment, PaymentAdmin)
 
-class PriceAdmin(admin.ModelAdmin):
-	list_display = ('get_formated_nominal', 'active')
-	ordering = ('nominal',)
-
-	def get_formated_nominal(self, obj):
-		return toRupiah(obj.nominal)
-	get_formated_nominal.short_description = 'Harga Sewa'
-	get_formated_nominal.admin_order_field = '-nominal'
-
-admin.site.register(Price, PriceAdmin)
-
 class RentAdmin(admin.ModelAdmin):
-	list_display = ('house', 'penyewa', 'billing_date', 'price', 'active', 'owner')
+	list_display = ('house', 'penyewa', 'tanggal_tagihan', 'harga', 'active', 'owner')
+	ordering = ('-active', 'house')
 
-	def penyewa(self, model_obj):
-		return "%s %s (%s)" % (model_obj.renter.user.first_name, model_obj.renter.user.last_name, model_obj.renter.phone)
+	def tanggal_tagihan(self, obj):
+		return "%s" % obj.billing_date.strftime("%d")
 
+	def penyewa(self, obj):
+		return "%s %s (%s)" % (obj.renter.user.first_name, obj.renter.user.last_name, obj.renter.phone)
+
+	def owner(self, obj):
+		return obj.house.owner
+
+	def harga(self, obj):
+		return "%s" % toRupiah(obj.price)
+
+	def get_form(self, request, obj=None, **kwargs):
+		if obj:
+			self.edit = True
+		return super().get_form(request, obj, **kwargs)
 	def formfield_for_foreignkey(self, db_field, request, **kwargs):
-		if db_field.name == 'price':
-			kwargs['queryset'] = Price.objects.filter(active=True).order_by('nominal')
-			return db_field.formfield(**kwargs)
-		elif db_field.name == 'house' and not request.user.is_superuser:
-			# current_house = 
-			kwargs['queryset'] = House.objects.filter(owner__user=request.user)
+		if db_field.name == 'house' and not request.user.is_superuser:
+			owner_house = House.objects.filter(owner__user=request.user)
+			kwargs['queryset'] = owner_house
 		return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
-	def owner(self, model_obj):
-		return "%s %s (%s)" % (model_obj.house.owner.user.first_name, model_obj.house.owner.user.last_name, model_obj.house.owner.phone)
 
 	def get_queryset(self, request):
 		qs = super().get_queryset(request)
-		if request.user.is_superuser:
-			return qs
-		return qs.filter(house__owner__user = request.user)
+		if not request.user.is_superuser:
+			return qs.filter(house__owner__user = request.user)
+		return qs
 
 admin.site.register(Rent, RentAdmin)
 
