@@ -1,9 +1,11 @@
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 from .models import *
 from .helpers import *
 
 class ExpenseAdmin(admin.ModelAdmin):
-	list_display = ('house', 'owner', 'remark', 'date', 'get_formated_nominal', 'receipt_number')
+	list_display = ('house', 'get_formated_nominal', 'remark', 'date', 'receipt_number', 'owner')
+	# readonly_fields = ('receipt_photo_text',)
 
 	def get_queryset(self, request):
 		qs = super().get_queryset(request)
@@ -13,6 +15,8 @@ class ExpenseAdmin(admin.ModelAdmin):
 
 	def get_formated_nominal(self, obj):
 		return toRupiah(obj.nominal)
+	get_formated_nominal.short_description = 'Biaya'
+	get_formated_nominal.admin_order_field = '-nominal'
 
 	def owner(self, obj):
 		return obj.house.owner
@@ -21,9 +25,6 @@ class ExpenseAdmin(admin.ModelAdmin):
 		if db_field.name == 'house' and not request.user.is_superuser:
 			kwargs['queryset'] = House.objects.filter(owner__user=request.user)
 		return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
-	get_formated_nominal.short_description = 'Biaya'
-	get_formated_nominal.admin_order_field = '-nominal'
 
 admin.site.register(Expense, ExpenseAdmin)
 
@@ -48,8 +49,8 @@ class HouseAdmin(admin.ModelAdmin):
 admin.site.register(House, HouseAdmin)
 
 class PaymentAdmin(admin.ModelAdmin):
-	list_display = ('house_name', 'start', 'billing_date', 'pay_date', 'harga', 'penyewa', 'owner')
-	ordering = ('-start', 'pay_date')
+	list_display = ('house_name', 'penyewa', 'start', 'pay_date', 'billing_date', 'harga', 'owner')
+	ordering = ('-start', '-pay_date')
 	readonly_fields = ('price',)
 	fields = ('rent', 'price', 'pay_date', 'start')
 
