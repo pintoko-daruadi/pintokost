@@ -39,6 +39,10 @@ class Expense(models.Model):
 	date = models.DateField('Tanggal')
 	remark = models.CharField('Catatan', max_length=200)
 	receipt_number = models.CharField('Nomor Kwitansi', max_length=50)
+	receipt_photo = models.ImageField(blank=True, null=True, upload_to=photo_path)
+
+	def get_upload_folder(self):
+		return 'expense'
 
 	def __str__(self):
 		return "%s %s (%s)" % (self.remark, toRupiah(self.nominal), self.house)
