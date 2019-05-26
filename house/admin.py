@@ -4,8 +4,19 @@ from .models import *
 from .helpers import *
 
 class ExpenseAdmin(admin.ModelAdmin):
-	list_display = ('house', 'get_formated_nominal', 'remark', 'date', 'receipt_number', 'owner')
-	# readonly_fields = ('receipt_photo_text',)
+	list_display = ('house', 'get_formated_nominal', 'remark', 'date', 'receipt_number', 'owner', 'receipt_photo_text')
+	readonly_fields = ('receipt_photo_text',)
+
+	def receipt_photo_text(self, obj):
+		try:
+			img_url = obj.receipt_photo.url
+		except:
+			img_url = '/media/default.jpg'
+
+		return mark_safe('<img src="{url}" width="300px" />'.format(
+			url= img_url
+			)
+		)
 
 	def get_queryset(self, request):
 		qs = super().get_queryset(request)
@@ -50,7 +61,7 @@ admin.site.register(House, HouseAdmin)
 
 class PaymentAdmin(admin.ModelAdmin):
 	list_display = ('house_name', 'penyewa', 'start', 'pay_date', 'billing_date', 'harga', 'owner')
-	ordering = ('-start', '-pay_date')
+	ordering = ('-start', 'rent__house__name',)
 	readonly_fields = ('price',)
 	fields = ('rent', 'price', 'pay_date', 'start')
 
