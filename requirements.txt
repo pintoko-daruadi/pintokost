@@ -1,1 +1,5 @@
-python-dotenv
+Django==2.1.7
+django-admin-tools==0.8.1
+Pillow==5.4.1
+python-dotenv==0.10.2
+pytz==2018.9
