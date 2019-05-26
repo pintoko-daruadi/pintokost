@@ -25,7 +25,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = ['192.168.110.104', 'localhost']
 
 
 # Application definition
@@ -74,10 +74,13 @@ WSGI_APPLICATION = 'pintokost.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-if DEBUG == True :
-    db_name = 'db_debug.sqlite3'
-else:
+
+db_prod = True
+if db_prod == True :
     db_name = 'db.sqlite3'
+else:
+    db_name = 'db_debug.sqlite3'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
