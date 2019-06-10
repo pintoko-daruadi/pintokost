@@ -25,7 +25,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = ['192.168.110.104', 'localhost']
+# ALLOWED_HOSTS = ['192.168.110.104', 'localhost', '192.168.43.92']
 
 
 # Application definition
@@ -79,7 +79,7 @@ db_prod = True
 if db_prod == True :
     db_name = 'db.sqlite3'
 else:
-    db_name = 'db_debug.sqlite3'
+    db_name = 'db_testing.sqlite3'
 
 DATABASES = {
     'default': {

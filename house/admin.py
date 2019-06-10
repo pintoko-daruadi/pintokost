@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
+from django.utils.dates import MONTHS
+from datetime import date
 from .models import *
 from .helpers import *
 
@@ -59,11 +61,50 @@ class HouseAdmin(admin.ModelAdmin):
 
 admin.site.register(House, HouseAdmin)
 
+class YearListFilter(admin.SimpleListFilter):
+	title = 'Tahun Sewa'
+	parameter_name = 'year'
+	default_value = None
+
+	def lookups(self, request, model_admin):
+		year_list = []
+		for key in range(2019, (date.today().year+1)):
+			year_list.append(
+				(key, str(key))
+			)
+		return year_list
+
+	def queryset(self, request, queryset):
+		if self.value():
+			year = int(self.value())
+			return queryset.filter(start__year__gte=year, start__year__lt=(year+1))
+		return queryset
+
+class MonthListFilter(admin.SimpleListFilter):
+	title = 'Bulan Sewa'
+	parameter_name = 'month'
+	default_value = None
+
+	def lookups(self, request, model_admin):
+		month_list = []
+		for key in range(1,13):
+			month_list.append(
+				(key, MONTHS[key])
+			)
+		return month_list
+
+	def queryset(self, request, queryset):
+		if self.value():
+			month = int(self.value())
+			return queryset.filter(start__month__gte=month, start__month__lt=(month+1))
+		return queryset
+
 class PaymentAdmin(admin.ModelAdmin):
 	list_display = ('house_name', 'penyewa', 'start', 'pay_date', 'billing_date', 'harga', 'owner')
 	ordering = ('-start', 'rent__house__name',)
 	readonly_fields = ('price',)
 	fields = ('rent', 'price', 'pay_date', 'start')
+	list_filter = (MonthListFilter, YearListFilter)
 
 	def billing_date(self, obj):
 		return "%s" % obj.rent.billing_date.strftime("%d")

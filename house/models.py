@@ -36,8 +36,8 @@ class Rent(models.Model):
 class Payment(models.Model):
 	rent = models.ForeignKey(Rent, on_delete=models.PROTECT)
 	price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name='Harga')
-	pay_date = models.DateField('Tanggal Bayar', default=None)
-	start = models.DateField('Mulai Sewa')
+	pay_date = models.DateField('Tanggal Bayar', default=None, help_text='Format: YYYY-MM-DD')
+	start = models.DateField('Mulai Sewa', help_text='Format: YYYY-MM-DD')
 
 	def __str__(self):
 		return "%s/%s (%s)" % (self.rent.house.name, self.start.strftime("%B"), self.rent.renter.user.username)
