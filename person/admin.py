@@ -4,8 +4,9 @@ from .forms import UserCompleteNameField
 from django.utils.safestring import mark_safe
 
 class IdentityInfoAdmin(admin.ModelAdmin):
-	list_display = ('user', 'nama_lengkap', 'identity_name', 'phone', 'gender', 'dob', 'is_renter', 'is_owner', 'identity_photo_')
+	list_display = ('user', 'nama_lengkap', 'identity_name', 'phone', 'is_renter', 'is_owner', 'identity_photo_')
 	readonly_fields = ('identity_photo_',)
+	ordering = ('-is_owner', '-is_renter')
 
 	def nama_lengkap(self, model_obj):
 		return "%s %s" % (model_obj.user.first_name, model_obj.user.last_name)

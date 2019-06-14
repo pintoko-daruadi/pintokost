@@ -142,9 +142,27 @@ class PaymentAdmin(admin.ModelAdmin):
 
 admin.site.register(Payment, PaymentAdmin)
 
+class ActiveRentFilter(admin.SimpleListFilter):
+	title = 'Penyewa Aktif'
+	parameter_name = 'is_active'
+	default_value = True
+
+	def lookups(self, request, model_admin):
+		return (
+			(True, 'Aktif'),
+			(False, 'Sudah Keluar')
+		)
+
+	def queryset(self, request, queryset):
+		if self.value():
+			return queryset.filter(active = self.value())
+
+		return queryset
+
 class RentAdmin(admin.ModelAdmin):
-	list_display = ('house', 'penyewa', 'tanggal_tagihan', 'harga', 'active', 'owner')
+	list_display = ('house', 'penyewa', 'alamat', 'tanggal_tagihan', 'harga', 'active', 'owner')
 	ordering = ('-active', 'house')
+	list_filter = (ActiveRentFilter,)
 
 	def tanggal_tagihan(self, obj):
 		return "%s" % obj.billing_date.strftime("%d")
@@ -157,6 +175,9 @@ class RentAdmin(admin.ModelAdmin):
 
 	def harga(self, obj):
 		return "%s" % toRupiah(obj.price)
+
+	def alamat(self, obj):
+		return "%s" % obj.house.address
 
 	def get_form(self, request, obj=None, **kwargs):
 		if obj:
