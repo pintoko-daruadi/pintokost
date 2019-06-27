@@ -101,7 +101,7 @@ class MonthListFilter(admin.SimpleListFilter):
 
 class PaymentAdmin(admin.ModelAdmin):
 	list_display = ('house_name', 'penyewa', 'start', 'pay_date', 'billing_date', 'harga', 'owner')
-	ordering = ('-start', 'rent__house__name',)
+	ordering = ('rent__house__name','-start',)
 	readonly_fields = ('price',)
 	fields = ('rent', 'price', 'pay_date', 'start')
 	list_filter = (MonthListFilter, YearListFilter)
