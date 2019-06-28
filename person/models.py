@@ -49,4 +49,4 @@ class IdentityInfo(models.Model):
 		return 'identity'
 
 	def __str__(self):
-		return "%s %s (%s) - %s" % (self.user.first_name, self.user.last_name, self.user.username, self.phone)
+		return "%s (%s) - %s" % (self.identity_name, self.user.username, self.phone)

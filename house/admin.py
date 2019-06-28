@@ -111,7 +111,7 @@ class PaymentAdmin(admin.ModelAdmin):
 	billing_date.short_description = 'Tanggal Tagihan'
 
 	def penyewa(self, obj):
-		return "%s %s (%s)" % (obj.rent.renter.user.first_name, obj.rent.renter.user.last_name, obj.rent.renter.phone)
+		return "%s (%s)" % (obj.rent.renter.identity_name, obj.rent.renter.phone)
 
 	def owner(self, obj):
 		return "%s %s (%s)" % (obj.rent.house.owner.user.first_name, obj.rent.house.owner.user.last_name, obj.rent.house.owner.phone)
