@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
+from django.utils.dates import MONTHS
+from datetime import date
 from .models import *
 from .helpers import *
 
@@ -59,18 +61,57 @@ class HouseAdmin(admin.ModelAdmin):
 
 admin.site.register(House, HouseAdmin)
 
+class YearListFilter(admin.SimpleListFilter):
+	title = 'Tahun Sewa'
+	parameter_name = 'year'
+	default_value = None
+
+	def lookups(self, request, model_admin):
+		year_list = []
+		for key in range(2019, (date.today().year+1)):
+			year_list.append(
+				(key, str(key))
+			)
+		return year_list
+
+	def queryset(self, request, queryset):
+		if self.value():
+			year = int(self.value())
+			return queryset.filter(start__year__gte=year, start__year__lt=(year+1))
+		return queryset
+
+class MonthListFilter(admin.SimpleListFilter):
+	title = 'Bulan Sewa'
+	parameter_name = 'month'
+	default_value = None
+
+	def lookups(self, request, model_admin):
+		month_list = []
+		for key in range(1,13):
+			month_list.append(
+				(key, MONTHS[key])
+			)
+		return month_list
+
+	def queryset(self, request, queryset):
+		if self.value():
+			month = int(self.value())
+			return queryset.filter(start__month__gte=month, start__month__lt=(month+1))
+		return queryset
+
 class PaymentAdmin(admin.ModelAdmin):
 	list_display = ('house_name', 'penyewa', 'start', 'pay_date', 'billing_date', 'harga', 'owner')
-	ordering = ('-start', 'rent__house__name',)
+	ordering = ('rent__house__name','-start',)
 	readonly_fields = ('price',)
 	fields = ('rent', 'price', 'pay_date', 'start')
+	list_filter = (MonthListFilter, YearListFilter)
 
 	def billing_date(self, obj):
 		return "%s" % obj.rent.billing_date.strftime("%d")
 	billing_date.short_description = 'Tanggal Tagihan'
 
 	def penyewa(self, obj):
-		return "%s %s (%s)" % (obj.rent.renter.user.first_name, obj.rent.renter.user.last_name, obj.rent.renter.phone)
+		return "%s (%s)" % (obj.rent.renter.identity_name, obj.rent.renter.phone)
 
 	def owner(self, obj):
 		return "%s %s (%s)" % (obj.rent.house.owner.user.first_name, obj.rent.house.owner.user.last_name, obj.rent.house.owner.phone)
@@ -101,21 +142,39 @@ class PaymentAdmin(admin.ModelAdmin):
 
 admin.site.register(Payment, PaymentAdmin)
 
+class ActiveRentFilter(admin.SimpleListFilter):
+	title = 'Penyewa Aktif'
+	parameter_name = 'is_active'
+	default_value = True
+
+	def lookups(self, request, model_admin):
+		return (
+			(True, 'Aktif'),
+			(False, 'Sudah Keluar')
+		)
+
+	def queryset(self, request, queryset):
+		if self.value():
+			return queryset.filter(active = self.value())
+
+		return queryset
+
 class RentAdmin(admin.ModelAdmin):
-	list_display = ('house', 'penyewa', 'tanggal_tagihan', 'harga', 'active', 'owner')
+	list_display = ('house', 'renter', 'alamat', 'tanggal_tagihan', 'harga', 'active', 'owner')
 	ordering = ('-active', 'house')
+	list_filter = (ActiveRentFilter,)
 
 	def tanggal_tagihan(self, obj):
 		return "%s" % obj.billing_date.strftime("%d")
-
-	def penyewa(self, obj):
-		return "%s %s (%s)" % (obj.renter.user.first_name, obj.renter.user.last_name, obj.renter.phone)
 
 	def owner(self, obj):
 		return obj.house.owner
 
 	def harga(self, obj):
 		return "%s" % toRupiah(obj.price)
+
+	def alamat(self, obj):
+		return "%s" % obj.house.address
 
 	def get_form(self, request, obj=None, **kwargs):
 		if obj:

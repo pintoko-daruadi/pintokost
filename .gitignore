@@ -1,6 +1,7 @@
 *.sqlite3*
-*/migrations
 */__pycache__/*
 *.log
 media/*
 *.env
+media.zip
+*.pyc

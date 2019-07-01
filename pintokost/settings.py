@@ -25,7 +25,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = ['192.168.110.104', 'localhost']
+ALLOWED_HOSTS = ['localhost', '10.10.15.189', '192.168.91.194','192.168.110.130', '192.168.100.10', '192.168.20.2', '192.168.43.92']
 
 
 # Application definition
@@ -79,7 +79,7 @@ db_prod = True
 if db_prod == True :
     db_name = 'db.sqlite3'
 else:
-    db_name = 'db_debug.sqlite3'
+    db_name = 'db_testing.sqlite3'
 
 DATABASES = {
     'default': {
@@ -126,7 +126,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
-
 MEDIA_URL = '/media/'
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
