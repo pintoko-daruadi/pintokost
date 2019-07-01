@@ -160,15 +160,12 @@ class ActiveRentFilter(admin.SimpleListFilter):
 		return queryset
 
 class RentAdmin(admin.ModelAdmin):
-	list_display = ('house', 'penyewa', 'alamat', 'tanggal_tagihan', 'harga', 'active', 'owner')
+	list_display = ('house', 'renter', 'alamat', 'tanggal_tagihan', 'harga', 'active', 'owner')
 	ordering = ('-active', 'house')
 	list_filter = (ActiveRentFilter,)
 
 	def tanggal_tagihan(self, obj):
 		return "%s" % obj.billing_date.strftime("%d")
-
-	def penyewa(self, obj):
-		return "%s %s (%s)" % (obj.renter.user.first_name, obj.renter.user.last_name, obj.renter.phone)
 
 	def owner(self, obj):
 		return obj.house.owner
