@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from .helpers import *
 from person.models import IdentityInfo
+import datetime
 
 # Create your models here.
 
@@ -28,19 +29,20 @@ class Rent(models.Model):
 	)
 	price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name='Harga')
 	billing_date = models.DateField('Tanggal Tagihan', default=None)
-	active = models.BooleanField('Status Sewa Aktif', default=True)
+	active = models.BooleanField('Status Sewa', default=True)
+	start_date = models.DateField("Awal Masuk", default=datetime.date.today, help_text='Format: YYYY-MM-DD')
 
 	def __str__(self):
-		return "%s / %s <%s>" % (self.house.name, self.renter.user.username, toRupiah(self.price))
+		return "%s / %s <%s>" % (self.house.name, self.renter, toRupiah(self.price))
 
 class Payment(models.Model):
 	rent = models.ForeignKey(Rent, on_delete=models.PROTECT)
-	price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name='Harga')
+	price = models.DecimalField(max_digits=12, default=0, decimal_places=2, verbose_name='Harga')
 	pay_date = models.DateField('Tanggal Bayar', default=None, help_text='Format: YYYY-MM-DD')
-	start = models.DateField('Mulai Sewa', help_text='Format: YYYY-MM-DD')
+	start = models.DateField('Mulai Sewa', default=None, help_text='Format: YYYY-MM-DD')
 
 	def __str__(self):
-		return "%s/%s (%s)" % (self.rent.house.name, self.start.strftime("%B"), self.rent.renter.user.username)
+		return "%s/%s (%s)" % (self.rent.house.name, self.start, self.rent.renter)
 
 class Expense(models.Model):
 	house = models.ForeignKey(House, on_delete=models.PROTECT)
