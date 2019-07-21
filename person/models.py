@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import User
 from house.helpers import *
 
 # Create your models here.
@@ -27,7 +28,7 @@ class IdentityInfo(models.Model):
 		('belum', 'Belum Menikah'),
 	)
 
-	user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, verbose_name='Username', default=None)
+	user = models.OneToOneField(User, on_delete=models.PROTECT, verbose_name='Username', default=None)
 	identity_type = models.CharField('Jenis Identitas', max_length=3, choices=IDENTITY_TYPES)
 	identity_number = models.CharField('Nomor Identitas', max_length=50)
 	identity_name = models.CharField('Nama Sesuai Identitas', max_length=60, null=True)
