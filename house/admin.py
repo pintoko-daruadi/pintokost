@@ -5,9 +5,29 @@ from datetime import date
 from .models import *
 from .helpers import *
 
+class ExpenseListByMonthFilter(admin.SimpleListFilter):
+	title = 'Bulan Expense'
+	parameter_name = 'month'
+	default_value = None
+
+	def lookups(self, request, model_admin):
+		month_list = []
+		for key in range(1,13):
+			month_list.append(
+				(key, MONTHS[key])
+			)
+		return month_list
+
+	def queryset(self, request, queryset):
+		if self.value():
+			month = int(self.value())
+			return queryset.filter(date__month=month)
+		return queryset
+
 class ExpenseAdmin(admin.ModelAdmin):
 	list_display = ('house', 'get_formated_nominal', 'remark', 'date', 'receipt_number', 'owner', 'receipt_photo_text')
 	readonly_fields = ('receipt_photo_text',)
+	list_filter = [ExpenseListByMonthFilter, ]
 
 	def receipt_photo_text(self, obj):
 		try:
@@ -77,7 +97,7 @@ class YearListFilter(admin.SimpleListFilter):
 	def queryset(self, request, queryset):
 		if self.value():
 			year = int(self.value())
-			return queryset.filter(start__year__gte=year, start__year__lt=(year+1))
+			return queryset.filter(start__year=year)
 		return queryset
 
 class MonthListFilter(admin.SimpleListFilter):
@@ -96,7 +116,7 @@ class MonthListFilter(admin.SimpleListFilter):
 	def queryset(self, request, queryset):
 		if self.value():
 			month = int(self.value())
-			return queryset.filter(start__month__gte=month, start__month__lt=(month+1))
+			return queryset.filter(start__month=month)
 		return queryset
 
 class PaymentAdmin(admin.ModelAdmin):
@@ -160,7 +180,7 @@ class ActiveRentFilter(admin.SimpleListFilter):
 		return queryset
 
 class RentAdmin(admin.ModelAdmin):
-	list_display = ('house', 'renter', 'alamat', 'tanggal_tagihan', 'harga', 'active', 'owner')
+	list_display = ('house', 'renter', 'start_date', 'alamat', 'tanggal_tagihan', 'harga', 'active', 'owner')
 	ordering = ('-active', 'house')
 	list_filter = (ActiveRentFilter,)
 
