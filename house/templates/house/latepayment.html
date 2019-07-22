@@ -1,21 +1,32 @@
-<html>
-	<head>
-		<title>Late Payment</title>
-	</head>
-	<body>
-		<h1>Late Payment List</h1>
-		<form action="/house/latepayment/">
-			{{ form.as_p }}
-			<input type="submit" name="submit" value="Find">
-		</form>
-		{% if data.count == 0 %}
-			<h3>All Paid</h3>
-		{% else %}
-			<ol>
-				{% for rent in data %}
-				<li><h3>{{ rent }}</h3></li>
-				{% endfor %}
-			</ol>
-		{% endif %}
-	</body>
-</html>
+{% extends 'house/base.html' %}
+{% block title %}Daftar Telat Bayar{% endblock %}
+{% block pagecontent %}
+	{% load crispy_forms_tags %}
+	<h1>Late Payment List</h1>
+	<form action="/house/latepayment/">
+		<div class="row">
+			<div class="col-4">
+				{{ form.year|as_crispy_field }}
+			</div>
+			<div class="col-4">
+				{{ form.month|as_crispy_field }}
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-4">
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary">Find</button>
+				</div>
+			</div>
+		</div>
+	</form>
+	{% if data.count == 0 %}
+		<h3>All Paid</h3>
+	{% else %}
+		<ol>
+			{% for rent in data %}
+			<li>{{ rent }} <span class="badge badge-info">tanggal: {{rent.start_date.day}}</span></li>
+			{% endfor %}
+		</ol>
+	{% endif %}
+{% endblock %}
