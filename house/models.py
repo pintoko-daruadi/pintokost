@@ -56,4 +56,4 @@ class Expense(models.Model):
 		return 'expense'
 
 	def __str__(self):
-		return "%s %s (%s)" % (self.remark, toRupiah(self.nominal), self.house)
+		return "%s <%s> (%s)" % (self.remark, toRupiah(self.nominal), self.house)

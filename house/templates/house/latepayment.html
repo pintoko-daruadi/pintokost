@@ -25,7 +25,18 @@
 	{% else %}
 		<ol>
 			{% for rent in data %}
-			<li>{{ rent }} <span class="badge badge-info">tanggal: {{rent.start_date.day}}</span></li>
+			<li>
+				{{ rent }} <span class="badge badge-info">tanggal: {{rent.start_date.day}}</span>
+				<p><img src="{{ rent.renter.identity_photo.url }}" width="250px"></p>
+				<ul style="list-style-type: square;">
+					{% for children in rent.renter.user.children.all %}
+					<li>
+						{{ children }}
+						<p><img src="{{ children.identity_photo.url }}" width="250px"></p>
+					</li>
+					{% endfor %}
+				</ul>
+			</li>
 			{% endfor %}
 		</ol>
 	{% endif %}
