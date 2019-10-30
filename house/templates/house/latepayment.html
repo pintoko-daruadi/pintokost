@@ -5,18 +5,11 @@
 	<h1>Late Payment List</h1>
 	<form action="/house/latepayment/">
 		<div class="row">
-			<div class="col-4">
+			<div class="col-6">
 				{{ form.year|as_crispy_field }}
 			</div>
-			<div class="col-4">
-				{{ form.month|as_crispy_field }}
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-4">
-				<div class="form-group">
-					<button type="submit" class="btn btn-primary">Find</button>
-				</div>
+			<div class="col-6">
+				{{ form.month|as_crispy_field}}
 			</div>
 		</div>
 	</form>
@@ -30,10 +23,12 @@
 				<p><img src="{{ rent.renter.identity_photo.url }}" width="250px"></p>
 				<ul style="list-style-type: square;">
 					{% for children in rent.renter.user.children.all %}
+					{% if children.is_renter %}
 					<li>
 						{{ children }}
 						<p><img src="{{ children.identity_photo.url }}" width="250px"></p>
 					</li>
+					{% endif %}
 					{% endfor %}
 				</ul>
 			</li>

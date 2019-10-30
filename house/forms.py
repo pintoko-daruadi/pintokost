@@ -7,5 +7,5 @@ class LatepaymentForm(forms.Form):
 	year = forms.ChoiceField(choices=years)
 	
 	months = [(x, MONTHS[x]) for x in range(1, 13)]
-	month = forms.ChoiceField(choices=months)
+	month = forms.ChoiceField(choices=months, widget=forms.Select(attrs={'onchange':'this.form.submit()'}))
 	

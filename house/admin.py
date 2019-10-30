@@ -212,7 +212,6 @@ class RentAdmin(admin.ModelAdmin):
 			if not request.user.is_superuser:
 				house = house.filter(owner__user=request.user)
 			rented_house_id = Rent.objects.filter(active=True).values_list('house__id', flat=True)
-			print(rented_house_id)
 			house = house.exclude(id__in=rented_house_id)
 			kwargs['queryset'] = house
 		elif db_field.name == 'renter':
