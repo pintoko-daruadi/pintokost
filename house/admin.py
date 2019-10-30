@@ -4,6 +4,7 @@ from django.utils.dates import MONTHS
 from datetime import date
 from .models import *
 from .helpers import *
+from person.models import IdentityInfo
 
 class ExpenseListByMonthFilter(admin.SimpleListFilter):
 	title = 'Bulan Expense'
@@ -56,13 +57,14 @@ class ExpenseAdmin(admin.ModelAdmin):
 
 	def formfield_for_foreignkey(self, db_field, request, **kwargs):
 		if db_field.name == 'house' and not request.user.is_superuser:
-			kwargs['queryset'] = House.objects.filter(owner__user=request.user)
+			kwargs['queryset'] = House.objects.filter(owner__user=request.user).order_by('name')
 		return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 admin.site.register(Expense, ExpenseAdmin)
 
 class HouseAdmin(admin.ModelAdmin):
 	list_display = ('name', 'pln_number', 'address', 'owner')
+	ordering = ('name',)
 
 	def get_form(self, request, obj=None, **kwargs):
 		if not request.user.is_superuser:
@@ -156,8 +158,11 @@ class PaymentAdmin(admin.ModelAdmin):
 		super().save_model(request, obj, form, change)
 
 	def formfield_for_foreignkey(self, db_field, request, **kwargs):
-		if db_field.name == 'rent' and not request.user.is_superuser:
-			kwargs['queryset'] = Rent.objects.filter(house__owner__user=request.user, active=True)
+		if db_field.name == 'rent':
+			rent = Rent.objects.filter(active=True)
+			if not request.user.is_superuser:
+				rent = rent.filter(house__owner__user=request.user)
+			kwargs['queryset'] = rent.order_by('house__name')
 		return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 admin.site.register(Payment, PaymentAdmin)
@@ -200,10 +205,18 @@ class RentAdmin(admin.ModelAdmin):
 		if obj:
 			self.edit = True
 		return super().get_form(request, obj, **kwargs)
+
 	def formfield_for_foreignkey(self, db_field, request, **kwargs):
-		if db_field.name == 'house' and not request.user.is_superuser:
-			owner_house = House.objects.filter(owner__user=request.user)
-			kwargs['queryset'] = owner_house
+		if db_field.name == 'house':
+			house = House.objects
+			if not request.user.is_superuser:
+				house = house.filter(owner__user=request.user)
+			rented_house_id = Rent.objects.filter(active=True).values_list('house__id', flat=True)
+			house = house.exclude(id__in=rented_house_id)
+			kwargs['queryset'] = house
+		elif db_field.name == 'renter':
+			renter = IdentityInfo.objects.filter(parent__isnull=True)
+			kwargs['queryset'] = renter
 		return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 	def get_queryset(self, request):
@@ -211,6 +224,11 @@ class RentAdmin(admin.ModelAdmin):
 		if not request.user.is_superuser:
 			return qs.filter(house__owner__user = request.user)
 		return qs
+
+	def get_readonly_fields(self, request, obj=None):
+		if obj:
+			return self.readonly_fields + ('house', 'renter')
+		return self.readonly_fields
 
 admin.site.register(Rent, RentAdmin)
 
