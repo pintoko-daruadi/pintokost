@@ -5,17 +5,51 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<title>Pintokost - {% block title %}{% endblock %}</title>
-		<link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+		<link href="{% static 'custom.min.css' %}" rel="stylesheet">
+		<link href="{% static 'bootstrap.flatly.css' %}" rel="stylesheet">
 	</head>
 	<body>
+		<nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
+			<a class="navbar-brand" href="#">Daruadi</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+
+			<div class="collapse navbar-collapse" id="navbarColor01">
+				<ul class="navbar-nav mr-auto">
+					<li class="nav-item active">
+						<a class="nav-link" href="#">Beranda <span class="sr-only">(current)</span></a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#">Pembayaran</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#">Pengeluaran</a>
+					</li>
+				</ul>
+				<form class="form-inline my-2 my-lg-0">
+					<input class="form-control mr-sm-2" type="text" placeholder="Search">
+					<button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+				</form>
+			</div>
+		</nav>
 		<div class="container">
 			<div class="row">
-				<div class="col-8">
+				<div class="col-lg-8">
 					{% block pagecontent %}
 					{% endblock %}
 				</div>
-				<div class="col-4">
-					Menu goes here
+				<div class="col-lg-4">
+					<div class="card text-white bg-primary mb-3" style="max-width: 20rem;">
+						<div class="card-header">Transaksi {{ month }} {{ year }} </div>
+						<div class="card-body">
+							<h5 class="card-title">Uang Masuk:</h5>
+							<h4 class="card-title text-success">Rp. 10 M</h4>
+							<hr>
+							<h5 class="card-title">Uang Keluar:</h5>
+							<h4 class="card-title text-warning">Rp. 5 M</h4>
+						</div>
+			  		</div>
 				</div>
 			</div>
 		</div>

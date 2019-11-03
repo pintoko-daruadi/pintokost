@@ -1,9 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.utils.dates import MONTHS
 from .forms import LatepaymentForm
 from .models import Payment, Rent
 
-# Create your views here.
+def index(request):
+	return redirect('/admin/')
+
 def latepayment(request):
+	month = MONTHS[int(request.GET.get('month', '(bulan tidak valid)'))]
+	year = request.GET.get('year', '(tahun tidak valid)')
 	if 'month' in request.GET:
 		form = LatepaymentForm(request.GET)
 		if form.is_valid():
@@ -14,4 +19,4 @@ def latepayment(request):
 	else:
 		not_paid_rent = {}
 		form = LatepaymentForm()
-	return render(request, 'house/latepayment.html', {'form': form, 'data': not_paid_rent})
+	return render(request, 'house/latepayment.html', {'form': form, 'data': not_paid_rent, 'month': month, 'year': year})

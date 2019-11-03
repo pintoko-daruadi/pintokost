@@ -17,8 +17,10 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
+from house import views
 
 urlpatterns = [
+	path('', views.index),
     path('admin/', admin.site.urls),
     path('house/', include('house.urls', namespace='house'))
 ]
