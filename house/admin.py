@@ -26,7 +26,7 @@ class ExpenseListByMonthFilter(admin.SimpleListFilter):
 		return queryset
 
 class ExpenseAdmin(admin.ModelAdmin):
-	list_display = ('house', 'get_formated_nominal', 'remark', 'date', 'receipt_number', 'owner', 'receipt_photo_text')
+	list_display = ('house', 'expense_type', 'get_formated_nominal', 'remark', 'date', 'receipt_number', 'owner', 'receipt_photo_text')
 	readonly_fields = ('receipt_photo_text',)
 	list_filter = [ExpenseListByMonthFilter, ]
 
@@ -58,6 +58,8 @@ class ExpenseAdmin(admin.ModelAdmin):
 	def formfield_for_foreignkey(self, db_field, request, **kwargs):
 		if db_field.name == 'house' and not request.user.is_superuser:
 			kwargs['queryset'] = House.objects.filter(owner__user=request.user).order_by('name')
+		if db_field == 'owner':
+			kwargs['queryset'] = ExpenseType.objects.filter(owner__user=request.user).order_by('name')
 		return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 admin.site.register(Expense, ExpenseAdmin)
@@ -231,6 +233,11 @@ class RentAdmin(admin.ModelAdmin):
 		return self.readonly_fields
 
 admin.site.register(Rent, RentAdmin)
+
+class ExpenseTypeAdmin(admin.ModelAdmin):
+	pass
+
+admin.site.register(ExpenseType, ExpenseTypeAdmin)
 
 admin.site.site_header = "Pintoko Rent House"
 admin.site.site_title = "Pintoko Rent House CMS"

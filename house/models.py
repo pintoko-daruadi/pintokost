@@ -44,10 +44,22 @@ class Payment(models.Model):
 	def __str__(self):
 		return "%s/%s (%s)" % (self.rent.house.name, self.start, self.rent.renter)
 
+class ExpenseType(models.Model):
+	name = models.CharField('Nama Pengeluaran', max_length=50)
+	owner = models.ForeignKey(
+		IdentityInfo,
+		on_delete=models.PROTECT,
+		verbose_name='Pemilik',
+		limit_choices_to={'is_owner': True}
+	)
+	def __str__(self):
+		return self.name
+
 class Expense(models.Model):
 	house = models.ForeignKey(House, on_delete=models.PROTECT)
 	nominal = models.PositiveIntegerField('Biaya Pengeluaran')
 	date = models.DateField('Tanggal')
+	expense_type = models.ForeignKey(ExpenseType, on_delete=models.PROTECT, default=1)
 	remark = models.CharField('Catatan', max_length=200)
 	receipt_number = models.CharField('Nomor Kwitansi', max_length=50)
 	receipt_photo = models.ImageField(blank=True, null=True, upload_to=photo_path)
