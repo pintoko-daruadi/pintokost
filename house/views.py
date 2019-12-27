@@ -30,6 +30,8 @@ def latepayment(request):
 		income = 0
 		outcome = 0
 		form = LatepaymentForm()
+	income = 0 if income is None else income
+	outcome = 0 if outcome is None else outcome
 	balance = income - outcome
 	data = {
 		'form': form,

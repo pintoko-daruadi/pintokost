@@ -123,12 +123,31 @@ class MonthListFilter(admin.SimpleListFilter):
 			return queryset.filter(start__month=month)
 		return queryset
 
+class HouseListFilter(admin.SimpleListFilter):
+	title = 'Rumah'
+	parameter_name = 'house'
+	default_value = None
+
+	def lookups(self, request, model_admin):
+		house_list = House.objects.filter(owner__user = request.user).values('id', 'name')
+		# house = []
+		# for v in house_list:
+		# 	house.append((v.id, v.name))
+		house =  {(v['id'],v['name']) for v in house_list}
+		# print(house)
+		return house
+
+	def queryset(self, request, queryset):
+		if self.value():
+			return queryset.filter(rent__house = self.value())
+		return queryset
+
 class PaymentAdmin(admin.ModelAdmin):
 	list_display = ('house_name', 'penyewa', 'start', 'pay_date', 'billing_date', 'harga', 'owner')
 	ordering = ('rent__house__name','-start',)
 	readonly_fields = ('price',)
 	fields = ('rent', 'price', 'pay_date', 'start')
-	list_filter = (MonthListFilter, YearListFilter)
+	list_filter = (MonthListFilter, YearListFilter, HouseListFilter)
 
 	def billing_date(self, obj):
 		return "%s" % obj.rent.billing_date.strftime("%d")
