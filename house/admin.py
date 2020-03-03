@@ -4,7 +4,7 @@ from django.utils.dates import MONTHS
 from datetime import date
 from .models import *
 from .helpers import *
-from person.models import IdentityInfo
+from profile.models import Profile
 
 class ExpenseListByMonthFilter(admin.SimpleListFilter):
 	title = 'Bulan Expense'
@@ -26,7 +26,7 @@ class ExpenseListByMonthFilter(admin.SimpleListFilter):
 		return queryset
 
 class ExpenseAdmin(admin.ModelAdmin):
-	list_display = ('house', 'get_formated_nominal', 'remark', 'date', 'receipt_number', 'owner', 'receipt_photo_text')
+	list_display = ('house', 'remark', 'date', 'get_formated_nominal', 'expense_type', 'owner', 'receipt_photo_text')
 	readonly_fields = ('receipt_photo_text',)
 	list_filter = [ExpenseListByMonthFilter, ]
 
@@ -45,7 +45,7 @@ class ExpenseAdmin(admin.ModelAdmin):
 		qs = super().get_queryset(request)
 		if request.user.is_superuser:
 			return qs
-		return qs.filter(house__owner__user = request.user)
+		return qs.filter(house__owner = request.user)
 
 	def get_formated_nominal(self, obj):
 		return toRupiah(obj.nominal)
@@ -57,7 +57,9 @@ class ExpenseAdmin(admin.ModelAdmin):
 
 	def formfield_for_foreignkey(self, db_field, request, **kwargs):
 		if db_field.name == 'house' and not request.user.is_superuser:
-			kwargs['queryset'] = House.objects.filter(owner__user=request.user).order_by('name')
+			kwargs['queryset'] = House.objects.filter(owner=request.user).order_by('name')
+		if db_field == 'owner':
+			kwargs['queryset'] = ExpenseType.objects.filter(owner=request.user).order_by('name')
 		return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 admin.site.register(Expense, ExpenseAdmin)
@@ -79,7 +81,7 @@ class HouseAdmin(admin.ModelAdmin):
 		qs = super().get_queryset(request)
 		if request.user.is_superuser:
 			return qs
-		return qs.filter(owner__user = request.user)
+		return qs.filter(owner = request.user)
 
 admin.site.register(House, HouseAdmin)
 
@@ -90,7 +92,7 @@ class YearListFilter(admin.SimpleListFilter):
 
 	def lookups(self, request, model_admin):
 		year_list = []
-		for key in range(2019, (date.today().year+1)):
+		for key in range(2020, (date.today().year+1)):
 			year_list.append(
 				(key, str(key))
 			)
@@ -121,22 +123,37 @@ class MonthListFilter(admin.SimpleListFilter):
 			return queryset.filter(start__month=month)
 		return queryset
 
+class HouseListFilter(admin.SimpleListFilter):
+	title = 'Rumah'
+	parameter_name = 'house'
+	default_value = None
+
+	def lookups(self, request, model_admin):
+		house_list = House.objects.filter(owner = request.user).order_by('name').values('id', 'name')
+		house =  {(v['id'],v['name']) for v in house_list}
+		return house
+
+	def queryset(self, request, queryset):
+		if self.value():
+			return queryset.filter(rent__house = self.value())
+		return queryset
+
 class PaymentAdmin(admin.ModelAdmin):
 	list_display = ('house_name', 'penyewa', 'start', 'pay_date', 'billing_date', 'harga', 'owner')
 	ordering = ('rent__house__name','-start',)
 	readonly_fields = ('price',)
 	fields = ('rent', 'price', 'pay_date', 'start')
-	list_filter = (MonthListFilter, YearListFilter)
+	list_filter = (MonthListFilter, YearListFilter, HouseListFilter)
 
 	def billing_date(self, obj):
 		return "%s" % obj.rent.billing_date.strftime("%d")
 	billing_date.short_description = 'Tanggal Tagihan'
 
 	def penyewa(self, obj):
-		return "%s (%s)" % (obj.rent.renter.identity_name, obj.rent.renter.phone)
+		return "%s (%s)" % (obj.rent.renter, obj.rent.renter.profile.phone)
 
 	def owner(self, obj):
-		return "%s %s (%s)" % (obj.rent.house.owner.user.first_name, obj.rent.house.owner.user.last_name, obj.rent.house.owner.phone)
+		return obj.rent.house.owner
 
 	def harga(self, obj):
 		return "%s" % toRupiah(obj.price)
@@ -145,7 +162,7 @@ class PaymentAdmin(admin.ModelAdmin):
 	def get_queryset(self, request):
 		qs = super().get_queryset(request)
 		if not request.user.is_superuser:
-			return qs.filter(rent__house__owner__user = request.user)
+			return qs.filter(rent__house__owner = request.user)
 		return qs
 
 	def house_name(self, obj):
@@ -161,7 +178,7 @@ class PaymentAdmin(admin.ModelAdmin):
 		if db_field.name == 'rent':
 			rent = Rent.objects.filter(active=True)
 			if not request.user.is_superuser:
-				rent = rent.filter(house__owner__user=request.user)
+				rent = rent.filter(house__owner=request.user)
 			kwargs['queryset'] = rent.order_by('house__name')
 		return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
@@ -185,7 +202,7 @@ class ActiveRentFilter(admin.SimpleListFilter):
 		return queryset
 
 class RentAdmin(admin.ModelAdmin):
-	list_display = ('house', 'renter', 'start_date', 'alamat', 'tanggal_tagihan', 'harga', 'active', 'owner')
+	list_display = ('house', 'renter', 'start_date', 'tanggal_tagihan', 'harga', 'active', 'owner')
 	ordering = ('-active', 'house')
 	list_filter = (ActiveRentFilter,)
 
@@ -210,19 +227,18 @@ class RentAdmin(admin.ModelAdmin):
 		if db_field.name == 'house':
 			house = House.objects
 			if not request.user.is_superuser:
-				house = house.filter(owner__user=request.user)
+				house = house.filter(owner=request.user)
 			rented_house_id = Rent.objects.filter(active=True).values_list('house__id', flat=True)
 			house = house.exclude(id__in=rented_house_id)
 			kwargs['queryset'] = house
 		elif db_field.name == 'renter':
-			renter = IdentityInfo.objects.filter(parent__isnull=True)
-			kwargs['queryset'] = renter
+			kwargs['queryset'] = User.objects.filter(profile__parent__isnull=True)
 		return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 	def get_queryset(self, request):
 		qs = super().get_queryset(request)
 		if not request.user.is_superuser:
-			return qs.filter(house__owner__user = request.user)
+			return qs.filter(house__owner=request.user)
 		return qs
 
 	def get_readonly_fields(self, request, obj=None):
@@ -231,6 +247,11 @@ class RentAdmin(admin.ModelAdmin):
 		return self.readonly_fields
 
 admin.site.register(Rent, RentAdmin)
+
+class ExpenseTypeAdmin(admin.ModelAdmin):
+	pass
+
+admin.site.register(ExpenseType, ExpenseTypeAdmin)
 
 admin.site.site_header = "Pintoko Rent House"
 admin.site.site_title = "Pintoko Rent House CMS"

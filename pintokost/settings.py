@@ -25,7 +25,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '10.10.15.189', '192.168.91.194','192.168.110.130', '192.168.100.10', '192.168.20.2', '192.168.43.92', '192.168.100.29']
+ALLOWED_HOSTS = ['localhost',]
 
 
 # Application definition
@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'crispy_forms',
     'house',
-    'person'
+    'profile'
 ]
 
 MIDDLEWARE = [
@@ -76,16 +76,14 @@ WSGI_APPLICATION = 'pintokost.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-db_prod = True
-if db_prod == True :
-    db_name = 'db.sqlite3'
-else:
-    db_name = 'db_testing.sqlite3'
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, db_name),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT')
     }
 }
 

@@ -1,7 +1,7 @@
 import os, random
 
 def toRupiah(nominal):
-	return "Rp.{:,}".format(int(nominal))
+	return "Rp. {:,}".format(int(nominal))
 
 def photo_path(instance, filename):
 	basefilename, file_extension= os.path.splitext(filename)
