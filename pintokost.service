@@ -1,0 +1,18 @@
+[Unit]
+Description=Service for running uwsgi of Pintokost
+Requires=network.target
+After=network.target
+
+[Service]
+ExecStart=/home/pintoko/work/pintokost_env/bin/uwsgi --ini /home/pintoko/work/pintokost_env/pintokost/uwsgi.ini
+User=pintoko
+Type=notify
+Restart=always
+TimeoutSec=60
+RuntimeDirectory=uwsgi
+KillSignal=SIGQUIT
+StandardError=syslog
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target

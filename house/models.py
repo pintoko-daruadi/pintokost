@@ -61,7 +61,7 @@ class Expense(models.Model):
 	date = models.DateField('Tanggal')
 	expense_type = models.ForeignKey(ExpenseType, on_delete=models.PROTECT, default=1)
 	remark = models.CharField('Catatan', max_length=200)
-	receipt_photo = models.ImageField(blank=True, null=True, upload_to=photo_path)
+	receipt_photo = models.FileField(blank=True, null=True, upload_to=photo_path)
 
 	def get_upload_folder(self):
 		return 'expense'
