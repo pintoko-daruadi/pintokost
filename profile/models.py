@@ -18,7 +18,7 @@ class Profile(models.Model):
 	phone = models.CharField('Phone', max_length=100)
 	bank_account = models.CharField('Bank', max_length=10, help_text='Bank yang digunakan', null=True, blank=True)
 	bank_account_number = models.CharField('Nomor Rekening', max_length=50, help_text='Nomor rekening bank yang digunakan', null=True, blank=True)
-	photo_ktp = models.ImageField(blank=True, null=True, upload_to=photo_path)
+	photo_ktp = models.FileField(blank=True, null=True, upload_to=photo_path)
 
 	def get_photo_ktp(self):
 		try:
