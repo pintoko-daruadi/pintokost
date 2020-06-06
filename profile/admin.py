@@ -15,6 +15,7 @@ class ProfileAdmin(UserAdmin):
 	list_display = ('user', 'group', 'parent', 'phone', 'identity_photo_')
 	readonly_fields = ('identity_photo_',)
 	inlines = (ProfileInline,)
+	# ordering = ('',)
 
 	def get_inline_instances(self, request, obj=None):
 		if not obj:
