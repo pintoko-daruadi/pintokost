@@ -2,8 +2,7 @@ from django.db import models
 from django.conf import settings
 from .helpers import toRupiah
 from django.contrib.auth.models import User, Permission
-import datetime
-import re
+import datetime, re, os
 
 # Create your models here.
 
