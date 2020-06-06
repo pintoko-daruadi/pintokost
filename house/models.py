@@ -1,10 +1,16 @@
 from django.db import models
 from django.conf import settings
-from .helpers import *
+from .helpers import toRupiah
 from django.contrib.auth.models import User, Permission
-import datetime
+import datetime, re, os
 
 # Create your models here.
+
+def expense_path(instance, filename):
+	basefilename, file_extension= os.path.splitext(filename)
+	new_filename = "{}_{}" % (instance.house, instance.expense_type)
+	new_filename = re.sub('[^A-Za-z]', '_', new_filename)
+	return 'expense/%Y/%m/%d/{filename}{ext}'.format(filename=new_filename, ext= file_extension)
 
 class House(models.Model):
 	name = models.CharField('Nama', max_length=50)
@@ -61,10 +67,7 @@ class Expense(models.Model):
 	date = models.DateField('Tanggal')
 	expense_type = models.ForeignKey(ExpenseType, on_delete=models.PROTECT, default=1)
 	remark = models.CharField('Catatan', max_length=200)
-	receipt_photo = models.FileField(blank=True, null=True, upload_to=photo_path)
-
-	def get_upload_folder(self):
-		return 'expense'
+	receipt_photo = models.FileField(blank=True, null=True, upload_to=expense_path)
 
 	def __str__(self):
 		return "%s <%s> (%s)" % (self.expense_type, toRupiah(self.nominal), self.house)
