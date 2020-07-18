@@ -12,9 +12,10 @@ class ProfileInline(admin.StackedInline):
 	fk_name = "user"
 
 class ProfileAdmin(UserAdmin):
-	list_display = ('user', 'group', 'parent', 'phone', 'identity_photo_')
+	list_display = ('user', 'group', 'parent', 'phone', 'identity_photo_', 'is_active')
 	readonly_fields = ('identity_photo_',)
 	inlines = (ProfileInline,)
+	ordering = ('-is_active', 'username',)
 
 	def get_inline_instances(self, request, obj=None):
 		if not obj:
