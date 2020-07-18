@@ -10,21 +10,22 @@
 	</head>
 	<body>
 		<nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
-			<a class="navbar-brand" href="#">Daruadi</a>
+			<a class="navbar-brand" href="#">Daruadi - Catatan KTRK</a>
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
 			</button>
 
+			{% if user.is_authenticated %}
 			<div class="collapse navbar-collapse" id="navbarColor01">
 				<ul class="navbar-nav mr-auto">
 					<li class="nav-item active">
 						<a class="nav-link" href="#">Beranda <span class="sr-only">(current)</span></a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" href="#">Pembayaran</a>
+						<a href="{% url 'admin:index' %}" class="nav-link">Admin Page</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" href="#">Pengeluaran</a>
+						<a href="{% url 'logout' %}" class="nav-link" href="#">logout</a>
 					</li>
 				</ul>
 				<form class="form-inline my-2 my-lg-0">
@@ -32,6 +33,7 @@
 					<button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
 				</form>
 			</div>
+			{% endif %}
 		</nav>
 		<div class="container">
 			<div class="row">

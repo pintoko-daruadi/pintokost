@@ -1,14 +1,17 @@
 from django.shortcuts import render, redirect
 from django.utils.dates import MONTHS
 from django.db.models import Sum
+from django.contrib.auth.decorators import login_required
 from datetime import datetime
-from .forms import LatepaymentForm
+from django.http import HttpResponse
+from .forms import LatepaymentForm, LoginForm
 from .models import Payment, Rent, Expense
 from .helpers import toRupiah
 
 def index(request):
 	return redirect('/admin/')
 
+@login_required
 def latepayment(request):
 	month = MONTHS[int(request.GET.get('month', datetime.now().month))]
 	year = request.GET.get('year', datetime.now().year)
