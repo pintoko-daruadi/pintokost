@@ -25,7 +25,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost','192.168.100.2', 'armbian.pintoko.local']
+ALLOWED_HOSTS = ['localhost','192.168.100.2']
 
 
 # Application definition
@@ -53,6 +53,9 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'pintokost.urls'
+
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/house/latepayment/'
 
 TEMPLATES = [
     {
