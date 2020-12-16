@@ -28,7 +28,7 @@ except IOError:
 SECRET_KEY = SECRETS['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = SECRETS['DEBUG']
 
 ALLOWED_HOSTS = SECRETS['ALLOWED_HOSTS']
 
