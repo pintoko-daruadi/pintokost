@@ -70,7 +70,7 @@ class HouseAdmin(admin.ModelAdmin):
 
 	def get_form(self, request, obj=None, **kwargs):
 		if not request.user.is_superuser:
-			if request.user.groups.filter(name='Owner').count() > 0:
+			if request.user.groups.filter(name='owner').count() > 0:
 				self.readonly_fields = ('owner',)
 		else:
 			self.readonly_fields = []
