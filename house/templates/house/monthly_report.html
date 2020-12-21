@@ -2,7 +2,7 @@
 {% block title %}Daftar Telat Bayar{% endblock %}
 {% block pagecontent %}
 	{% load crispy_forms_tags %}
-	<h1>Daftar Penghuni Telat Bayar</h1>
+	<h3>Daftar Penghuni Telat Bayar</h3>
 	<form action="/house/latepayment/">
 		<div class="row">
 			<div class="col-6">
@@ -43,7 +43,7 @@
 		<h4 class="card-title text-success">{{ income }}</h4>
 		<hr>
 		<h5 class="card-title">Uang Keluar:</h5>
-		<h4 class="card-title text-warning">{{ outcome }}</h4>
+		<h4 class="card-title text-warning">{{ expense }}</h4>
 		<hr>
 		<h5 class="card-title">Total Kas:</h5>
 		<h4 class="card-title text-{{ balance_css_class }}">{{ balance }}</h4>
