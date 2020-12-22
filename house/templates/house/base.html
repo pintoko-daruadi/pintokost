@@ -4,7 +4,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<title>Pintokost - {% block title %}{% endblock %}</title>
+		<title>{% block title %}{% endblock %} - Pintokost</title>
 		<link href="{% static 'custom.min.css' %}" rel="stylesheet">
 		<link href="{% static 'bootstrap.flatly.css' %}" rel="stylesheet">
 	</head>
@@ -18,26 +18,31 @@
 			{% if user.is_authenticated %}
 			<div class="collapse navbar-collapse" id="navbarColor01">
 				<ul class="navbar-nav mr-auto">
-					<li class="nav-item active">
-						<a class="nav-link" href="#">Beranda <span class="sr-only">(current)</span></a>
+					<li class="nav-item {% if menu_home %}active{% endif %}">
+						<a class="nav-link" href="#">Beranda {% if menu_home %}<span class="sr-only">(current)</span>{% endif %}</a>
 					</li>
-					<li class="nav-item">
-						<a href="{% url 'admin:index' %}" class="nav-link">Admin Page</a>
+					<li class="nav-item {% if menu_house %}active{% endif %}">
+						<a class="nav-link" href="{% url 'house:list' %}">Rumah {% if menu_house %}<span class="sr-only">(current)</span>{% endif %}</a>
 					</li>
+					{% if request.user.is_superuser %}
+					    <li class="nav-item">
+							<a href="{% url 'admin:index' %}" class="nav-link">Admin Page</a>
+						</li>
+					{% endif %}
 					<li class="nav-item">
-						<a href="{% url 'logout' %}" class="nav-link" href="#">logout</a>
+						<a href="{% url 'logout' %}" class="nav-link">Logout ({{request.user}})</a>
 					</li>
 				</ul>
-				<form class="form-inline my-2 my-lg-0">
+				<!-- <form class="form-inline my-2 my-lg-0">
 					<input class="form-control mr-sm-2" type="text" placeholder="Search">
 					<button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
-				</form>
+				</form> -->
 			</div>
 			{% endif %}
 		</nav>
 		<div class="container">
 			<div class="row">
-				<div class="col-lg-8">
+				<div class="col-lg-8 mb-3 mt-n4">
 					{% block pagecontent %}
 					{% endblock %}
 				</div>
