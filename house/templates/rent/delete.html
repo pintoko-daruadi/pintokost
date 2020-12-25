@@ -2,6 +2,8 @@
 {% block title %}Hapus Data Sewa{% endblock %}
 
 {% block pagecontent %}
+	<p>Untuk mengganti penyewa rumah atau mengubah harga, anda harus terlebih dahulu menghapus data penyewaan.</p>
+	<p>Kemudian anda bisa membuat sewa atau harga baru.</p>
 	<form method="post">{% csrf_token %}
 		<p>Apakah anda yakin ingin menghapus sewa rumah "{{ object }}"?</p>
 		<input type="submit" value="Hapus" class="btn btn-danger">
