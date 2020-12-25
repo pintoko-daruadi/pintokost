@@ -65,7 +65,7 @@ class ExpenseAdmin(admin.ModelAdmin):
 admin.site.register(Expense, ExpenseAdmin)
 
 class HouseAdmin(admin.ModelAdmin):
-	list_display = ('name', 'pln_number', 'address', 'owner')
+	list_display = ('name', 'pln_number', 'address', 'owner', 'active')
 	ordering = ('name',)
 	autocomplete_fields = ['owner']
 

@@ -90,8 +90,10 @@ class HouseDeleteView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMix
 	success_message = "Rumah berhasil dihapus"
 
 	def delete(self, request, *args, **kwargs):
+		self.object = self.get_object()
+		self.object.soft_delete()
 		messages.success(self.request, self.success_message)
-		return super(HouseDeleteView, self).delete(request, *args, **kwargs)
+		return HttpResponseRedirect(self.get_success_url())
 
 class HouseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 	permission_required = 'house.view_house'
@@ -104,7 +106,7 @@ class HouseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 		return context
 
 	def get_queryset(self):
-		return House.objects.filter(owner = self.request.user)
+		return House.objects.filter(owner = self.request.user, active=True)
 
 class HouseUpdateView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMixin, SuccessMessageMixin, UpdateView):
 	permission_required = 'house.change_house'

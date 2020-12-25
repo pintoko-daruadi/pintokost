@@ -1,10 +1,9 @@
-from django.db import models
 from django.conf import settings
-from .helpers import toRupiah
 from django.contrib.auth.models import User, Permission
+from django.db import models
+from django.utils import timezone
+from .helpers import toRupiah
 import datetime, re, os
-
-# Create your models here.
 
 def expense_path(instance, filename):
 	basefilename, file_extension= os.path.splitext(filename)
@@ -16,6 +15,9 @@ class House(models.Model):
 	name = models.CharField('Nama', max_length=50)
 	address = models.CharField('Alamat', max_length=300)
 	pln_number = models.CharField('Nomor PLN', max_length=20)
+	active = models.BooleanField(default=True)
+	deleted_at = models.DateTimeField(blank=True, null=True)
+
 	owner = models.ForeignKey(
 		User,
 		on_delete=models.PROTECT,
@@ -24,6 +26,11 @@ class House(models.Model):
 
 	def __str__(self):
 		return self.name
+
+	def soft_delete(self):
+		self.active = False
+		self.deleted_at = timezone.now()
+		self.save()
 
 class Rent(models.Model):
 	renter = models.ForeignKey(
@@ -37,12 +44,14 @@ class Rent(models.Model):
 	billing_date = models.DateField('Tanggal Tagihan', default=None)
 	active = models.BooleanField('Status Sewa', default=True)
 	start_date = models.DateField("Awal Masuk", default=datetime.date.today, help_text='Format: YYYY-MM-DD')
+	deleted_at = models.DateTimeField(blank=True, null=True)
 
 	def __str__(self):
 		return "%s : %s <%s>" % (self.house.name, self.renter.get_full_name(), toRupiah(self.price))
 
 	def soft_delete(self):
 		self.active = False
+		self.deleted_at = timezone.now()
 		self.save()
 
 class Payment(models.Model):
