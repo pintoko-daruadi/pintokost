@@ -22,10 +22,11 @@ from house import views
 
 urlpatterns = [
     path('', views.index),
+    path('admin/', admin.site.urls),
+    path('house/', include('house.urls', namespace='house')),
     path('login/', auth_views.LoginView.as_view(template_name='house/login.html', redirect_authenticated_user=True), name='login'),
     path('logout/', auth_views.logout_then_login, name='logout'),
-    path('admin/', admin.site.urls),
-    path('house/', include('house.urls', namespace='house'))
+    path("select2/", include("django_select2.urls")),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
