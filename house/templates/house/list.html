@@ -26,7 +26,11 @@
 				</div>
 			</div>
 			<div class="card-footer w-100 text-muted">
-				Footer stating cats are CUTE little animals
+				{% for rent in object.rent_set.all %}
+					{% if rent.active %}
+						{{rent}}
+					{% endif %}
+				{% endfor %}
 			</div>
 		</div>
 	{% empty %}
