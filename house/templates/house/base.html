@@ -7,6 +7,7 @@
 		<title>{% block title %}{% endblock %} - Pintokost</title>
 		<link href="{% static 'custom.min.css' %}" rel="stylesheet">
 		<link href="{% static 'bootstrap.flatly.css' %}" rel="stylesheet">
+		{% block css %}{% endblock %}
 	</head>
 	<body>
 		<nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
@@ -21,14 +22,19 @@
 					<li class="nav-item {% if menu_home %}active{% endif %}">
 						<a class="nav-link" href="#">Beranda {% if menu_home %}<span class="sr-only">(current)</span>{% endif %}</a>
 					</li>
+
+					{% if perms.house.add_house %}
 					<li class="nav-item {% if menu_house %}active{% endif %}">
 						<a class="nav-link" href="{% url 'house:list' %}">Rumah {% if menu_house %}<span class="sr-only">(current)</span>{% endif %}</a>
 					</li>
-					{% if request.user.is_superuser %}
+					{% endif %}
+
+					{% if request.user.is_staff %}
 					    <li class="nav-item">
 							<a href="{% url 'admin:index' %}" class="nav-link">Admin Page</a>
 						</li>
 					{% endif %}
+
 					<li class="nav-item">
 						<a href="{% url 'logout' %}" class="nav-link">Logout ({{request.user}})</a>
 					</li>
@@ -42,7 +48,7 @@
 		</nav>
 		<div class="container">
 			<div class="row">
-				<div class="col-lg-8 mb-3 mt-n4">
+				<div class="col-lg-8 mb-3">
 					{% block pagecontent %}
 					{% endblock %}
 				</div>
@@ -54,5 +60,6 @@
 		</div>
 		<script type="text/javascript" src="{% static 'jquery/jquery-3.4.1.min.js' %}"></script>
 		<script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+		{% block javascript %}{% endblock %}
 	</body>
 </html>
