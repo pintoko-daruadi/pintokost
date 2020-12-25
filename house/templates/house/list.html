@@ -17,8 +17,11 @@
 					<div class="card-block px-2 pb-2">
 						<h4 class="card-title">{{object.name}}</h4>
 						<p class="card-text">{{object.address}}</p>
-						<a href="#" class="btn btn-info btn-sm">Ubah</a>
-						<a href="#" class="btn btn-danger btn-sm">Hapus</a>
+						<a href="{% url 'house:update' object.id %}" class="btn btn-info btn-sm">Ubah</a>
+						<a href="{% url 'house:delete' object.id %}" class="btn btn-danger btn-sm">Hapus</a>
+						&nbsp
+						&nbsp
+						<a href="{% url 'house:rent' object.id %}" class="btn btn-success btn-sm">Set Penyewa</a>
 					</div>
 				</div>
 			</div>

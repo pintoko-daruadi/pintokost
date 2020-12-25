@@ -1,15 +1,17 @@
+from django import forms
 from django.db.models import Sum
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import render, redirect
 from django.utils.dates import MONTHS
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 from datetime import datetime
-from .forms import LatepaymentForm, HouseForm
+from .forms import LatepaymentForm, RentForm
+from .mixins import HouseOwnerMixin
 from .models import Payment, Rent, Expense, House
 from .helpers import toRupiah
 
@@ -55,34 +57,85 @@ def latepayment(request):
 
 	return render(request, 'house/monthly_report.html', data)
 
-class HouseListView(LoginRequiredMixin, ListView):
+class HouseCreateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView):
+	permission_required = 'house.add_house'
+	model = House
+	fields = ('name', 'address', 'pln_number')
+	template_name = 'house/form.html'
+	success_url = reverse_lazy('house:list')
+	success_message = "Rumah %(name)s berhasil ditambah"
+
+	def get_context_data(self, **kwargs):
+		context = super(HouseCreateView, self).get_context_data(**kwargs)
+		context['menu_house'] = True
+		context['action'] = 'Tambah'
+		return context
+
+	def get_form(self, form_class=None):
+		form = super(HouseCreateView, self).get_form(form_class)
+		form.fields['address'].widget = forms.Textarea()
+		return form
+	
+	def form_valid(self, form):
+		form.instance.owner = self.request.user
+		return super(HouseCreateView, self).form_valid(form)
+
+class HouseDeleteView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMixin, SuccessMessageMixin, DeleteView):
+	permission_required = 'house.delete_house'
+	model = House
+	template_name = 'house/delete.html'
+	success_url = reverse_lazy('house:list')
+	success_message = "Rumah %(name)s berhasil dihapus"
+
+class HouseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+	permission_required = 'house.view_house'
 	model = House
 	template_name = 'house/list.html'
-
-	def get_queryset(self):
-		return House.objects.filter(owner = self.request.user)
 
 	def get_context_data(self, **kwargs):
 		context = super(HouseListView, self).get_context_data(**kwargs)
 		context['menu_house'] = True
 		return context
 
-class AddHouseView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+	def get_queryset(self):
+		return House.objects.filter(owner = self.request.user)
+
+class HouseUpdateView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMixin, SuccessMessageMixin, UpdateView):
+	permission_required = 'house.change_house'
 	model = House
-	fields = ('name', 'address', 'pln_number')
+	fields = ['name', 'address', 'pln_number']
 	template_name = 'house/form.html'
 	success_url = reverse_lazy('house:list')
-	success_message = "Rumah %(name)s - %(address)s berhasil ditambahkan"
+	success_message = "Rumah %(name)s berhasil diperbarui"
+	
+	def get_context_data(self, **kwargs):
+		context = super(HouseUpdateView, self).get_context_data(**kwargs)
+		context['menu_house'] = True
+		context['action'] = 'Ubah'
+		return context
+
+	def get_form(self, form_class=None):
+		form = super(HouseUpdateView, self).get_form(form_class)
+		form.fields['address'].widget = forms.Textarea()
+		return form
+
+class RentCreateView(LoginRequiredMixin, HouseOwnerMixin, SuccessMessageMixin, CreateView):
+	model = Rent
+	form_class = RentForm
+	template_name = 'rent/form.html'
+	success_url = reverse_lazy('house:list')
+	success_message = "Sewa %(renter)s berhasil ditambah"
 
 	def get_context_data(self, **kwargs):
-		context = super(AddHouseView, self).get_context_data(**kwargs)
+		context = super(RentCreateView, self).get_context_data(**kwargs)
 		context['menu_house'] = True
 		context['action'] = 'Tambah'
 		return context
-	
+
 	def form_valid(self, form):
-		form.instance.owner = self.request.user
-		return super(AddHouseView, self).form_valid(form)
+		form.instance.billing_date = form.instance.start_date
+		form.instance.house = House.objects.get(id=self.kwargs.get('pk'))
+		return super(RentCreateView, self).form_valid(form)
 
 class ThanksView(LoginRequiredMixin, TemplateView):
 	template_name = 'house/thanks.html'
