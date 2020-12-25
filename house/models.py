@@ -23,7 +23,7 @@ class House(models.Model):
 	)
 
 	def __str__(self):
-		return self.name 
+		return self.name
 
 class Rent(models.Model):
 	renter = models.ForeignKey(
@@ -39,7 +39,11 @@ class Rent(models.Model):
 	start_date = models.DateField("Awal Masuk", default=datetime.date.today, help_text='Format: YYYY-MM-DD')
 
 	def __str__(self):
-		return "%s / %s <%s>" % (self.house.name, self.renter.profile, toRupiah(self.price))
+		return "%s : %s <%s>" % (self.house.name, self.renter.get_full_name(), toRupiah(self.price))
+
+	def soft_delete(self):
+		self.active = False
+		self.save()
 
 class Payment(models.Model):
 	rent = models.ForeignKey(Rent, on_delete=models.PROTECT)

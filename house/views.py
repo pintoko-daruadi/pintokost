@@ -2,7 +2,9 @@ from django import forms
 from django.db.models import Sum
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.utils.dates import MONTHS
 from django.urls import reverse_lazy
@@ -11,7 +13,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 from datetime import datetime
 from .forms import LatepaymentForm, RentForm
-from .mixins import HouseOwnerMixin
+from .mixins import HouseOwnerMixin, HouseRentedMixin
 from .models import Payment, Rent, Expense, House
 from .helpers import toRupiah
 
@@ -75,17 +77,21 @@ class HouseCreateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessag
 		form = super(HouseCreateView, self).get_form(form_class)
 		form.fields['address'].widget = forms.Textarea()
 		return form
-	
+
 	def form_valid(self, form):
 		form.instance.owner = self.request.user
 		return super(HouseCreateView, self).form_valid(form)
 
-class HouseDeleteView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMixin, SuccessMessageMixin, DeleteView):
+class HouseDeleteView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMixin, DeleteView):
 	permission_required = 'house.delete_house'
 	model = House
 	template_name = 'house/delete.html'
 	success_url = reverse_lazy('house:list')
-	success_message = "Rumah %(name)s berhasil dihapus"
+	success_message = "Rumah berhasil dihapus"
+
+	def delete(self, request, *args, **kwargs):
+		messages.success(self.request, self.success_message)
+		return super(HouseDeleteView, self).delete(request, *args, **kwargs)
 
 class HouseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 	permission_required = 'house.view_house'
@@ -107,7 +113,7 @@ class HouseUpdateView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMix
 	template_name = 'house/form.html'
 	success_url = reverse_lazy('house:list')
 	success_message = "Rumah %(name)s berhasil diperbarui"
-	
+
 	def get_context_data(self, **kwargs):
 		context = super(HouseUpdateView, self).get_context_data(**kwargs)
 		context['menu_house'] = True
@@ -119,7 +125,8 @@ class HouseUpdateView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMix
 		form.fields['address'].widget = forms.Textarea()
 		return form
 
-class RentCreateView(LoginRequiredMixin, HouseOwnerMixin, SuccessMessageMixin, CreateView):
+class RentCreateView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMixin, HouseRentedMixin, SuccessMessageMixin, CreateView):
+	permission_required = 'house.add_rent'
 	model = Rent
 	form_class = RentForm
 	template_name = 'rent/form.html'
@@ -136,6 +143,19 @@ class RentCreateView(LoginRequiredMixin, HouseOwnerMixin, SuccessMessageMixin, C
 		form.instance.billing_date = form.instance.start_date
 		form.instance.house = House.objects.get(id=self.kwargs.get('pk'))
 		return super(RentCreateView, self).form_valid(form)
+
+class RentDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+	permission_required = 'house.change_rent'
+	model = Rent
+	template_name = 'rent/delete.html'
+	success_url = reverse_lazy('house:list')
+	success_message = "Sewa Rumah berhasil dihapus"
+
+	def delete(self, request, *args, **kwargs):
+		self.object = self.get_object()
+		self.object.soft_delete()
+		messages.success(self.request, self.success_message)
+		return HttpResponseRedirect(self.get_success_url())
 
 class ThanksView(LoginRequiredMixin, TemplateView):
 	template_name = 'house/thanks.html'
