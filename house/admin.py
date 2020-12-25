@@ -67,6 +67,7 @@ admin.site.register(Expense, ExpenseAdmin)
 class HouseAdmin(admin.ModelAdmin):
 	list_display = ('name', 'pln_number', 'address', 'owner')
 	ordering = ('name',)
+	autocomplete_fields = ['owner']
 
 	def get_form(self, request, obj=None, **kwargs):
 		if not request.user.is_superuser:
