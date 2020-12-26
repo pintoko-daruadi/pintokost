@@ -7,9 +7,9 @@ urlpatterns = [
     path('<int:pk>/rent', views.RentCreateView.as_view(), name='rent'),
     path('<int:pk>/rent/deactivate', views.RentDeleteView.as_view(), name='rent_deactivate'),
     path('add/', views.HouseCreateView.as_view(), name='add'),
-    path('update/<int:pk>', views.HouseUpdateView.as_view(), name='update'),
     path('delete/<int:pk>', views.HouseDeleteView.as_view(), name='delete'),
     path('list/', views.HouseListView.as_view(), name='list'),
     path('latepayment/', views.latepayment, name='latepayment'),
     path('thanks/', views.ThanksView.as_view(), name='thanks'),
+    path('update/<int:pk>', views.HouseUpdateView.as_view(), name='update'),
 ]
