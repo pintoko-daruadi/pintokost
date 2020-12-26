@@ -7,6 +7,6 @@
 	<form method="post">{% csrf_token %}
 		<p>Apakah anda yakin ingin menghapus sewa rumah "{{ object }}"?</p>
 		<input type="submit" value="Hapus" class="btn btn-danger">
-		<button class="btn btn-warning" onclick="history.back()">Batal</button>
+		<a href="{% url 'house:list' %}" class="btn btn-warning">Batal</a>
 	</form>
 {% endblock %}
