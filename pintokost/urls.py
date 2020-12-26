@@ -26,6 +26,7 @@ urlpatterns = [
     path('house/', include('house.urls', namespace='house')),
     path('login/', auth_views.LoginView.as_view(template_name='house/login.html', redirect_authenticated_user=True), name='login'),
     path('logout/', auth_views.logout_then_login, name='logout'),
+    path('profile/', include('profile.urls', namespace='profile')),
     path("select2/", include("django_select2.urls")),
 ]
 
