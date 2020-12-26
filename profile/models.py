@@ -17,7 +17,7 @@ class Profile(models.Model):
 
 	user = models.OneToOneField(User, on_delete=models.PROTECT, verbose_name='Username', default=None)
 	parent = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name='Kepala Keluarga', null=True, blank=True, related_name='children')
-	nik = models.CharField('NIK KTP', max_length=50)
+	nik = models.CharField('NIK KTP', max_length=16)
 	occupation = models.CharField('Pekerjaan', max_length=100)
 	phone = models.CharField('Phone', max_length=100)
 	bank_account = models.CharField('Bank', max_length=10, help_text='Bank yang digunakan', null=True, blank=True)
