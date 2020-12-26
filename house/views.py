@@ -127,13 +127,12 @@ class HouseUpdateView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMix
 		form.fields['address'].widget = forms.Textarea()
 		return form
 
-class RentCreateView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMixin, HouseRentedMixin, SuccessMessageMixin, CreateView):
+class RentCreateView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMixin, HouseRentedMixin, CreateView):
 	permission_required = 'house.add_rent'
 	model = Rent
 	form_class = RentForm
 	template_name = 'rent/form.html'
 	success_url = reverse_lazy('house:list')
-	success_message = "Sewa %(renter)s berhasil ditambah"
 
 	def get_context_data(self, **kwargs):
 		context = super(RentCreateView, self).get_context_data(**kwargs)
@@ -144,6 +143,7 @@ class RentCreateView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMixi
 	def form_valid(self, form):
 		form.instance.billing_date = form.instance.start_date
 		form.instance.house = House.objects.get(id=self.kwargs.get('pk'))
+		messages.success(self.request, "Penyewa di "+str(form.instance.house)+" berhasil ditambah")
 		return super(RentCreateView, self).form_valid(form)
 
 class RentDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
