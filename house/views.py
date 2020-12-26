@@ -91,6 +91,8 @@ class HouseDeleteView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMix
 
 	def delete(self, request, *args, **kwargs):
 		self.object = self.get_object()
+		for rent in self.object.rent_set.filter(active=True):
+			rent.soft_delete()
 		self.object.soft_delete()
 		messages.success(self.request, self.success_message)
 		return HttpResponseRedirect(self.get_success_url())
