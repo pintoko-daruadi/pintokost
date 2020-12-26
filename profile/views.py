@@ -16,10 +16,9 @@ class ProfileCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
 	template_name = 'profile/profile_form.html'
 
 	def form_valid(self, form):
-		timestamp = int(time.time())
 		first_name = form.cleaned_data.get('first_name')
 		last_name = form.cleaned_data.get('last_name')
-		username = first_name[:1] + last_name + str(timestamp)
+		username = first_name[:1] + last_name + form.cleaned_data.get('nik')[-4:]
 		user = User.objects.create_user(username=username.lower(), first_name=first_name, last_name=last_name)
 		renter_group, created = Group.objects.get_or_create(name = 'renter')
 		user.groups.add(renter_group)
