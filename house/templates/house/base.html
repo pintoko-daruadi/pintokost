@@ -21,7 +21,7 @@
 				<ul class="navbar-nav mr-auto">
 					{% if perms.house.add_house %}
 					<li class="nav-item {% if menu_house %}active{% endif %}">
-						<a class="nav-link" href="{% url 'house:list' %}">Rumah {% if menu_house %}<span class="sr-only">(current)</span>{% endif %}</a>
+						<a class="nav-link" href="{% url 'house:list' %}">Data Rumah {% if menu_house %}<span class="sr-only">(current)</span>{% endif %}</a>
 					</li>
 					{% endif %}
 
