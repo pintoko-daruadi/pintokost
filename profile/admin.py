@@ -46,3 +46,7 @@ class ProfileAdmin(UserAdmin):
 
 admin.site.unregister(User)
 admin.site.register(User, ProfileAdmin)
+
+# @admin.register(Profile)
+# class ProfileOnlyAdmin(admin.ModelAdmin):
+# 	list_display = ('user', 'nik')
