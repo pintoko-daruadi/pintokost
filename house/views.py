@@ -28,13 +28,13 @@ def latepayment(request):
 		form = LatepaymentForm(request.GET)
 		if form.is_valid():
 			rent_ids = Payment.objects.filter(start__month=form.cleaned_data['month'], start__year=form.cleaned_data['year']).values_list('rent__id', flat=True)
-			not_paid_rent = Rentt.objects.filter(active=True, start_date__month__lte=form.cleaned_data['month'], start_date__year__lte=form.cleaned_data['year']).exclude(id__in = rent_ids).order_by('house')
+			not_paid_rent = Rent.objects.filter(active=True, start_date__month__lte=form.cleaned_data['month'], start_date__year__lte=form.cleaned_data['year']).exclude(id__in = rent_ids).order_by('house')
 			income = Payment.objects.filter(start__month=form.cleaned_data['month'], start__year=form.cleaned_data['year'])
 			expense = Expense.objects.filter(date__month=form.cleaned_data['month'], date__year=form.cleaned_data['year'])
 			if not request.user.is_superuser:
-				not_paid_rent = not_paid_rent.filter(house__owner__user=request.user)
-				income = income.filter(rent__house__owner__user=request.user)
-				expense = expense.filter(house__owner__user=request.user)
+				not_paid_rent = not_paid_rent.filter(house__owner=request.user)
+				income = income.filter(rent__house__owner=request.user)
+				expense = expense.filter(house__owner=request.user)
 			income = income.aggregate(Sum('price'))['price__sum']
 			expense = expense.aggregate(Sum('nominal'))['nominal__sum']
 	else:
