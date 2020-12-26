@@ -10,6 +10,17 @@ class RenterForm(forms.ModelForm):
 		model = Profile
 		fields = ['nik', 'occupation', 'phone']
 
+	def clean_nik(self):
+		nik = self.cleaned_data.get('nik')
+
+		if len(nik) < 5:
+			raise forms.ValidationError('NIK KTP minimal 5 digit')
+
+		if not str(nik).isnumeric():
+			raise forms.ValidationError('NIK KTP harus diisi angka')
+
+		return nik
+
 	first_name = forms.CharField(label='Nama Depan', required=True)
 	last_name = forms.CharField(label='Nama Belakang', required=True)
 
