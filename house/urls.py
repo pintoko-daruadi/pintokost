@@ -10,6 +10,7 @@ urlpatterns = [
     path('delete/<int:pk>', views.HouseDeleteView.as_view(), name='delete'),
     path('list/', views.HouseListView.as_view(), name='list'),
     path('latepayment/', views.latepayment, name='latepayment'),
+    path('pay/<int:pk>/<int:year>/<int:month>', views.PaymentCreateView.as_view(), name='pay'),
     path('thanks/', views.ThanksView.as_view(), name='thanks'),
     path('update/<int:pk>', views.HouseUpdateView.as_view(), name='update'),
 ]

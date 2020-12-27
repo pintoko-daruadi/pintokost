@@ -5,7 +5,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
 from django.utils.dates import MONTHS
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
@@ -128,6 +129,39 @@ class HouseUpdateView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMix
 		form = super(HouseUpdateView, self).get_form(form_class)
 		form.fields['address'].widget = forms.Textarea()
 		return form
+
+class PaymentCreateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView):
+	model = Payment
+	permission_required = 'house.add_payment'
+	fields = ['price', 'pay_date', 'start']
+	rent = None
+	success_message = "Pembayaran berhasil disimpan"
+
+	def get_initial(self):
+		self.rent = get_object_or_404(Rent, id=self.kwargs.get('pk'), house__owner=self.request.user)
+		return {
+			'rent': self.rent,
+			'price': int(self.rent.price),
+			'pay_date': timezone.now(),
+			'start': datetime(self.kwargs.get('year'), self.kwargs.get('month'), 1)
+		}
+
+	def get_context_data(self, **kwargs):
+		context = super(PaymentCreateView, self).get_context_data(**kwargs)
+		context['rent'] = self.rent
+		return context
+
+	def get_form(self, form_class=None):
+		form = super(PaymentCreateView, self).get_form(form_class)
+		form.fields['price'].widget.attrs = {'step': 1000}
+		return form
+
+	def get_success_url(self):
+		return reverse_lazy('house:latepayment')+'?year='+str(self.kwargs.get('year'))+'&month='+str(self.kwargs.get('month'))
+
+	def form_valid(self, form):
+		form.instance.rent = self.rent
+		return super(PaymentCreateView, self).form_valid(form)
 
 class RentCreateView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMixin, HouseRentedMixin, CreateView):
 	permission_required = 'house.add_rent'

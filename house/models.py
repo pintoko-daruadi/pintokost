@@ -17,7 +17,6 @@ class House(models.Model):
 	pln_number = models.CharField('Nomor PLN', max_length=20)
 	active = models.BooleanField(default=True)
 	deleted_at = models.DateTimeField(blank=True, null=True)
-
 	owner = models.ForeignKey(
 		User,
 		on_delete=models.PROTECT,
