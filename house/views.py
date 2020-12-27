@@ -169,11 +169,19 @@ class RentCreateView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMixi
 	form_class = RentForm
 	template_name = 'rent/form.html'
 	success_url = reverse_lazy('house:list')
+	house = None
+
+	def get_initial(self):
+		self.house = get_object_or_404(House, id=self.kwargs.get('pk'), owner=self.request.user)
+		return {
+			'house': self.house
+		}
 
 	def get_context_data(self, **kwargs):
 		context = super(RentCreateView, self).get_context_data(**kwargs)
 		context['menu_house'] = True
 		context['action'] = 'Tambah'
+		context['house'] = self.house
 		return context
 
 	def form_valid(self, form):

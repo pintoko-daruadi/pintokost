@@ -13,6 +13,7 @@ Daftar Rumah
 
 {% block pagecontent %}
 	<h4>Form {{action}} Rental Rumah</h4>
+	<h5>Rumah: <b>{{house}}</b></h5>
 	<form method="POST">
 		{% csrf_token %}
 		{{ form | crispy }}
