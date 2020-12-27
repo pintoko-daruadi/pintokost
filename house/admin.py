@@ -61,7 +61,6 @@ class ExpenseAdmin(admin.ModelAdmin):
 		if db_field == 'owner':
 			kwargs['queryset'] = ExpenseType.objects.filter(owner=request.user).order_by('name')
 		return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
 admin.site.register(Expense, ExpenseAdmin)
 
 class HouseAdmin(admin.ModelAdmin):
