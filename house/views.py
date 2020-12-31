@@ -25,6 +25,9 @@ def index(request):
 def latepayment(request):
 	month = MONTHS[int(request.GET.get('month', datetime.now().month))]
 	year = request.GET.get('year', datetime.now().year)
+	income = 0
+	expense = 0
+	not_paid_rent = None
 	if 'month' in request.GET:
 		form = LatepaymentForm(request.GET)
 		if form.is_valid():
