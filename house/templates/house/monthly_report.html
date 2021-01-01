@@ -16,7 +16,7 @@
 	{% for rent in data %}
 		<div class="row my-2">
 			<div class="col-sm-8">
-				{{ rent.house.name }} >> {{rent.renter.get_full_name }} [{{rent.renter.profile.phone}}]
+				{{ rent.house.name }} >> {{rent.renter.get_full_name}} [{{rent.renter.profile.phone}}] <span class="badge badge-info">tgl: {{rent.billing_date|date:"d"}}</span>
 			</div>
 			<div class="col-sm-4">
 				<a href="{% url 'house:pay' rent.id form.year.value form.month.value %}" class="btn btn-primary btn-sm">Catat Pembayaran</a>
