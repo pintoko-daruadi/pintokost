@@ -8,36 +8,31 @@
 		<div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
 		{% endfor %}
 	{% endif %}
-	<form action="/house/latepayment/">
-		<div class="row">
-			<div class="col-6">
-				{{ form.year|as_crispy_field }}
+	<form method="post">
+		{% csrf_token %}
+		{{form | crispy}}
+		<input type="submit" name="submit" value="Submit" class="btn btn-primary">
+	</form>
+	{% for rent in data %}
+		<div class="row my-2">
+			<div class="col-sm-8">
+				{{ rent.house.name }} >> {{rent.renter.get_full_name }} [{{rent.renter.profile.phone}}]
 			</div>
-			<div class="col-6">
-				{{ form.month|as_crispy_field}}
+			<div class="col-sm-4">
+				<a href="{% url 'house:pay' rent.id form.year.value form.month.value %}" class="btn btn-primary btn-sm">Catat Pembayaran</a>
 			</div>
 		</div>
-	</form>
-	{% if data.count == 0 %}
-		<h3>All Paid</h3>
-	{% else %}
-		<ol>
-			{% for rent in data %}
+		<ul style="list-style-type: square;">
+			{% for children in rent.renter.children.all %}
 			<li>
-				{{ rent }} <span class="badge badge-info">tanggal: {{rent.start_date.day}}</span>
-				<p><a href="{% url 'house:pay' rent.id form.year.value form.month.value %}" class="btn btn-primary btn-sm">Catat Pembayaran</a></p>
-				<ul style="list-style-type: square;">
-					{% for children in rent.renter.children.all %}
-					<li>
-						{{ children }}
-						<p><img src="{{ children.get_photo_ktp }}" width="250px"></p>
-					</li>
-					{% endfor %}
-				</ul>
+				{{ children }}
+				<p><img src="{{ children.get_photo_ktp }}" width="250px"></p>
 			</li>
 			{% endfor %}
-		</ol>
-	{% endif %}
+		</ul>
+	{% empty %}
+		<h3>No Data</h3>
+	{% endfor %}
 {% endblock %}
 
 {% block sidecontent %}

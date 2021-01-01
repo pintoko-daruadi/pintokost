@@ -17,10 +17,10 @@ class PenghuniWidget(s2forms.ModelSelect2Widget):
 class LatepaymentForm(forms.Form):
 	START_SAVE_DATA = 2021
 	years = [(x, str(x)) for x in range(START_SAVE_DATA, (date.today().year+1))]
-	year = forms.ChoiceField(choices=years, widget=forms.Select(attrs={'onchange':'this.form.submit()'}))
+	year = forms.ChoiceField(choices=years)
 
 	months = [(x, MONTHS[x]) for x in range(1, 13)]
-	month = forms.ChoiceField(choices=months, widget=forms.Select(attrs={'onchange':'this.form.submit()'}))
+	month = forms.ChoiceField(choices=months)
 
 class RentForm(forms.ModelForm):
 	class Meta:

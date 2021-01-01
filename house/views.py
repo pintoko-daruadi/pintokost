@@ -23,32 +23,31 @@ def index(request):
 
 @login_required
 def latepayment(request):
-	month = MONTHS[int(request.GET.get('month', datetime.now().month))]
-	year = request.GET.get('year', datetime.now().year)
+	month = MONTHS[datetime.now().month]
+	year = datetime.now().year
+	not_paid_rent = {}
 	income = 0
 	expense = 0
-	not_paid_rent = None
-	if 'month' in request.GET:
-		form = LatepaymentForm(request.GET)
+	balance = 0
+	form = LatepaymentForm(initial = {'year': year, 'month': month})
+
+	if request.method == "POST":
+		form = LatepaymentForm(request.POST)
 		if form.is_valid():
 			rent_ids = Payment.objects.filter(start__month=form.cleaned_data['month'], start__year=form.cleaned_data['year']).values_list('rent__id', flat=True)
-			not_paid_rent = Rent.objects.filter(active=True, start_date__month__lte=form.cleaned_data['month'], start_date__year__lte=form.cleaned_data['year']).exclude(id__in = rent_ids).order_by('house')
+			not_paid_rent = Rent.objects.filter(active=True).exclude(id__in = rent_ids).order_by('house')
 			income = Payment.objects.filter(start__month=form.cleaned_data['month'], start__year=form.cleaned_data['year'])
 			expense = Expense.objects.filter(date__month=form.cleaned_data['month'], date__year=form.cleaned_data['year'])
 			if not request.user.is_superuser:
 				not_paid_rent = not_paid_rent.filter(house__owner=request.user)
 				income = income.filter(rent__house__owner=request.user)
 				expense = expense.filter(house__owner=request.user)
-			income = income.aggregate(Sum('price'))['price__sum']
-			expense = expense.aggregate(Sum('nominal'))['nominal__sum']
-	else:
-		not_paid_rent = {}
-		income = 0
-		expense = 0
-		form = LatepaymentForm()
-	income = 0 if income is None else income
-	expense = 0 if expense is None else expense
-	balance = income - expense
+			income = int(income.aggregate(Sum('price'))['price__sum'] or 0)
+			expense = int(expense.aggregate(Sum('nominal'))['nominal__sum'] or 0)
+			balance = income - expense
+			month = form.cleaned_data['month']
+			year = form.cleaned_data['year']
+
 	data = {
 		'form': form,
 		'data': not_paid_rent,
