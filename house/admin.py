@@ -61,16 +61,16 @@ class ExpenseAdmin(admin.ModelAdmin):
 		if db_field == 'owner':
 			kwargs['queryset'] = ExpenseType.objects.filter(owner=request.user).order_by('name')
 		return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
 admin.site.register(Expense, ExpenseAdmin)
 
 class HouseAdmin(admin.ModelAdmin):
-	list_display = ('name', 'pln_number', 'address', 'owner')
+	list_display = ('name', 'pln_number', 'address', 'owner', 'active')
 	ordering = ('name',)
+	autocomplete_fields = ['owner']
 
 	def get_form(self, request, obj=None, **kwargs):
 		if not request.user.is_superuser:
-			if request.user.groups.filter(name='Owner').count() > 0:
+			if request.user.groups.filter(name='owner').count() > 0:
 				self.readonly_fields = ('owner',)
 		else:
 			self.readonly_fields = []

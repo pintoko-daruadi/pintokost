@@ -1,0 +1,45 @@
+{% extends 'house/base.html' %}
+{% block title %}Daftar Rumah{% endblock %}
+
+{% block pagecontent %}
+	{% if messages %}
+		{% for message in messages %}
+		<div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+		{% endfor %}
+	{% endif %}
+	{% for object in object_list %}
+		<div class="card mb-3">
+			<div class="row no-gutters">
+				<div class="col-auto">
+					<img src="//placehold.it/100" class="img-fluid" alt="">
+				</div>
+				<div class="col">
+					<div class="card-block px-2 pb-2">
+						<h4 class="card-title">{{object.name}}</h4>
+						<p class="card-text">{{object.address}}</p>
+						<a href="{% url 'house:update' object.id %}" class="btn btn-info btn-sm">Ubah</a>
+						<a href="{% url 'house:delete' object.id %}" class="btn btn-danger btn-sm">Hapus</a>
+						&nbsp
+						&nbsp
+						<a href="{% url 'house:rent' object.id %}" class="btn btn-success btn-sm">Set Penyewa</a>
+					</div>
+				</div>
+			</div>
+			<div class="card-footer w-100 text-muted">
+				{% for rent in object.rent_set.all %}
+					{% if rent.active %}
+						{{rent}}
+					{% endif %}
+				{% endfor %}
+			</div>
+		</div>
+	{% empty %}
+		<p>Daftar rumah masih kosong, Anda belum mencatat rumah.</p>
+	{% endfor %}
+{% endblock %}
+
+{% block sidecontent %}
+	<div class="row">
+		<div class="col"><a href="{% url 'house:add' %}" class="btn btn-primary">Tambah Rumah</a></div>
+	</div>
+{% endblock %}

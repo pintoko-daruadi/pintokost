@@ -1,38 +1,38 @@
 {% extends 'house/base.html' %}
-{% block title %}Daftar Telat Bayar{% endblock %}
+{% block title %}Daftar Belum Bayar{% endblock %}
 {% block pagecontent %}
 	{% load crispy_forms_tags %}
-	<h1>Daftar Penghuni Telat Bayar</h1>
-	<form action="/house/latepayment/">
-		<div class="row">
-			<div class="col-6">
-				{{ form.year|as_crispy_field }}
+	<h3>Daftar Belum Bayar</h3>
+	{% if messages %}
+		{% for message in messages %}
+		<div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+		{% endfor %}
+	{% endif %}
+	<form method="post">
+		{% csrf_token %}
+		{{form | crispy}}
+		<input type="submit" name="submit" value="Submit" class="btn btn-primary">
+	</form>
+	{% for rent in data %}
+		<div class="row my-2">
+			<div class="col-sm-8">
+				{{ rent.house.name }} >> {{rent.renter.get_full_name}} [{{rent.renter.profile.phone}}] <span class="badge badge-info">tgl: {{rent.billing_date|date:"d"}}</span>
 			</div>
-			<div class="col-6">
-				{{ form.month|as_crispy_field}}
+			<div class="col-sm-4">
+				<a href="{% url 'house:pay' rent.id form.year.value form.month.value %}" class="btn btn-primary btn-sm">Catat Pembayaran</a>
 			</div>
 		</div>
-	</form>
-	{% if data.count == 0 %}
-		<h3>All Paid</h3>
-	{% else %}
-		<ol>
-			{% for rent in data %}
+		<ul style="list-style-type: square;">
+			{% for children in rent.renter.children.all %}
 			<li>
-				{{ rent }} <span class="badge badge-info">tanggal: {{rent.start_date.day}}</span>
-				<p><img src="{{ rent.renter.profile.get_photo_ktp }}" width="350px"></p>
-				<ul style="list-style-type: square;">
-					{% for children in rent.renter.children.all %}
-					<li>
-						{{ children }}
-						<p><img src="{{ children.get_photo_ktp }}" width="350px"></p>
-					</li>
-					{% endfor %}
-				</ul>
+				{{ children }}
+				<p><img src="{{ children.get_photo_ktp }}" width="250px"></p>
 			</li>
 			{% endfor %}
-		</ol>
-	{% endif %}
+		</ul>
+	{% empty %}
+		<h3>No Data</h3>
+	{% endfor %}
 {% endblock %}
 
 {% block sidecontent %}
@@ -43,7 +43,7 @@
 		<h4 class="card-title text-success">{{ income }}</h4>
 		<hr>
 		<h5 class="card-title">Uang Keluar:</h5>
-		<h4 class="card-title text-warning">{{ outcome }}</h4>
+		<h4 class="card-title text-warning">{{ expense }}</h4>
 		<hr>
 		<h5 class="card-title">Total Kas:</h5>
 		<h4 class="card-title text-{{ balance_css_class }}">{{ balance }}</h4>
