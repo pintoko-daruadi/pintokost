@@ -159,7 +159,7 @@ class PaymentCreateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMess
 		return form
 
 	def get_success_url(self):
-		return reverse_lazy('house:latepayment')+'?year='+str(self.kwargs.get('year'))+'&month='+str(self.kwargs.get('month'))
+		return reverse_lazy('house:latepayment')
 
 	def form_valid(self, form):
 		form.instance.rent = self.rent
