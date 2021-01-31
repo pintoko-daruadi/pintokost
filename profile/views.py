@@ -1,12 +1,16 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group, User
 from django.contrib import messages
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic.edit import FormView
-from .forms import RenterForm
+from django.views.generic.edit import CreateView, FormView
+from .forms import LandlordSignupForm, RenterForm
 from .models import Profile
 import time
+
+class LandlordSignupView(CreateView):
+	form_class = LandlordSignupForm
+
 
 class ProfileCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
 	permission_required = 'auth.add_user'
