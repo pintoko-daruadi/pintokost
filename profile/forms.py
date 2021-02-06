@@ -1,12 +1,13 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Profile
 
 
-class LandlordSignupForm(forms.ModelForm):
-	full_name = forms.CharField(max_length=30, required=True)
-	email = form.EmailField(max_length=256, required=True, help_text='Harap Gunakan Email Aktif Anda')
-	nik = form.IntegerField(required=True)
+class LandlordSignupForm(UserCreationForm):
+	full_name = forms.CharField(max_length=30, required=True, help_text='Harap gunakan nama lengkap Anda')
+	email = forms.EmailField(max_length=256, required=True, help_text='Harap gunakan email aktif Anda')
+	nik = forms.IntegerField(required=True, help_text='Silahkan gunakan NIK pada KTP', label='NIK')
 
 	def save(self, commit=True, *args, **kwargs):
 		user = super(LandlordSignupForm, self).save(commit=False, *args, **kwargs)

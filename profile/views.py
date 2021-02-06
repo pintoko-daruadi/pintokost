@@ -10,6 +10,7 @@ import time
 
 class LandlordSignupView(CreateView):
 	form_class = LandlordSignupForm
+	template_name = 'profile/landlord_signup.html'
 
 
 class ProfileCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
