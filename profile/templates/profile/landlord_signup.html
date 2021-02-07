@@ -1,0 +1,15 @@
+{% extends 'house/base.html' %}
+{% block title %}Daftar Pemilik Baru{% endblock %}
+{% load crispy_forms_tags %}
+
+{% block pagecontent %}
+	<h4>Pendaftaran Baru</h4>
+	<form method="POST">
+		{% csrf_token %}
+		{{ form | crispy }}
+		<button type="submit" class="btn btn-primary">Simpan</button>
+	</form>
+{% endblock %}
+
+{% block sidecontent %}
+{% endblock %}
