@@ -34,7 +34,7 @@ class LandlordSignupForm(UserCreationForm):
 
 	class Meta:
 		model = User
-		fields = ['nik', 'full_name', 'email', 'password1', 'password2']
+		fields = ['full_name', 'email', 'password1', 'password2']
 
 class RenterForm(forms.ModelForm):
 	full_name = forms.CharField(required=True, help_text='Harap gunakan nama lengkap sesuai KTP')
