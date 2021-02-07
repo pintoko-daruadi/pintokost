@@ -2,9 +2,11 @@ from django import forms
 from django.utils.dates import MONTHS
 from datetime import date
 from django_select2 import forms as s2forms
+from django.contrib.auth.models import User
 from .models import Rent
 
-class PenghuniWidget(s2forms.ModelSelect2Widget):
+class RenterWidget(s2forms.ModelSelect2Widget):
+	queryset = User.objects.filter(groups__name='renter')
 	search_fields = [
 		'first_name__icontains',
 		'last_name__icontains',
@@ -27,7 +29,7 @@ class RentForm(forms.ModelForm):
 		model = Rent
 		fields = ['renter', 'price', 'start_date']
 		widgets = {
-			'renter': PenghuniWidget,
+			'renter': RenterWidget(max_results = 2),
 		}
 
 	def __init__(self, *args, **kwargs):
