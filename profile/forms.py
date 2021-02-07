@@ -9,7 +9,7 @@ class UserCompleteNameField(forms.ModelChoiceField):
 		return "%s %s - %s" % (obj.first_name, obj.last_name, obj.username)
 
 class LandlordSignupForm(UserCreationForm):
-	full_name = forms.CharField(max_length=30, required=True, help_text='Harap gunakan nama lengkap sesuai KTP')
+	full_name = forms.CharField(max_length=30, required=True, help_text='Harap gunakan nama lengkap sesuai KTP', label='Nama Lengkap')
 	email = forms.EmailField(max_length=256, required=True, help_text='Harap gunakan email aktif Anda')
 
 	def save(self, commit=True, *args, **kwargs):
