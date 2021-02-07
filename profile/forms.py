@@ -21,7 +21,7 @@ class LandlordSignupForm(UserCreationForm):
 		else:
 			user.first_name = split_name[0]
 			user.last_name = split_name[0]
-		user.username = (user.first_name[0]+user.last_name).lower() + self.cleaned_data.get('nik')[-4:]
+
 		user.save()
 		renter_group, created = Group.objects.get_or_create(name = 'owner')
 		user.groups.add(renter_group)
@@ -34,7 +34,7 @@ class LandlordSignupForm(UserCreationForm):
 
 	class Meta:
 		model = User
-		fields = ['full_name', 'email', 'password1', 'password2']
+		fields = ['username', 'full_name', 'email', 'password1', 'password2']
 
 class RenterForm(forms.ModelForm):
 	full_name = forms.CharField(required=True, help_text='Harap gunakan nama lengkap sesuai KTP')
