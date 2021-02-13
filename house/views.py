@@ -12,7 +12,7 @@ from django.urls import reverse_lazy
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
-from datetime import datetime
+from datetime import date
 from .forms import LatepaymentForm, RentForm
 from .mixins import HouseOwnerMixin, HouseRentedMixin
 from .models import Payment, Rent, Expense, House
@@ -23,8 +23,8 @@ def index(request):
 
 @login_required
 def latepayment(request):
-	month = MONTHS[datetime.now().month]
-	year = datetime.now().year
+	month = date.today().month
+	year = date.today().year
 	not_paid_rent = {}
 	income = 0
 	expense = 0
@@ -35,7 +35,7 @@ def latepayment(request):
 		form = LatepaymentForm(request.POST)
 		if form.is_valid():
 			rent_ids = Payment.objects.filter(start__month=form.cleaned_data['month'], start__year=form.cleaned_data['year']).values_list('rent__id', flat=True)
-			not_paid_rent = Rent.objects.filter(active=True).exclude(id__in = rent_ids).order_by('house')
+			not_paid_rent = Rent.objects.filter(active=True, start_date__lte=date(int(form.cleaned_data['year']), int(form.cleaned_data['month']), 15)).exclude(id__in = rent_ids).order_by('house')
 			income = Payment.objects.filter(start__month=form.cleaned_data['month'], start__year=form.cleaned_data['year'])
 			expense = Expense.objects.filter(date__month=form.cleaned_data['month'], date__year=form.cleaned_data['year'])
 			if not request.user.is_superuser:
@@ -45,7 +45,7 @@ def latepayment(request):
 			income = int(income.aggregate(Sum('price'))['price__sum'] or 0)
 			expense = int(expense.aggregate(Sum('nominal'))['nominal__sum'] or 0)
 			balance = income - expense
-			month = form.cleaned_data['month']
+			month = MONTHS[int(form.cleaned_data['month'])]
 			year = form.cleaned_data['year']
 
 	data = {
