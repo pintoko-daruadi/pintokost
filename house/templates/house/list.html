@@ -11,7 +11,9 @@
 		<div class="card mb-3">
 			<div class="row no-gutters">
 				<div class="col-auto">
-					<img src="//placehold.it/100" class="img-fluid" alt="">
+					{% if object.image %}
+					<img src="{{ object.image.url }}" width="100" class="img-fluid" alt="img of {{object.name}}">
+					{% endif %}
 				</div>
 				<div class="col">
 					<div class="card-block px-2 pb-2">

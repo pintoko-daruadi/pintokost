@@ -11,6 +11,9 @@ def expense_path(instance, filename):
 	new_filename = re.sub('[^A-Za-z]', '_', new_filename)
 	return 'expense/%Y/%m/%d/{filename}{ext}'.format(filename=new_filename, ext= file_extension)
 
+def house_dir(instance, filename):
+	return 'house/{0}/{1}'.format(instance.owner.username, filename)
+
 class House(models.Model):
 	name = models.CharField('Nama', max_length=50)
 	address = models.CharField('Alamat', max_length=300)
@@ -22,6 +25,26 @@ class House(models.Model):
 		on_delete=models.PROTECT,
 		limit_choices_to={'groups__name': 'owner'}
 	)
+	image = models.ImageField(null=True, blank=True, upload_to=house_dir)
+
+	def save(self):
+		import sys
+		from PIL import Image
+		from io import BytesIO
+		from django.core.files.uploadedfile import InMemoryUploadedFile
+
+		im = Image.open(self.image)
+		basewidth = 200
+		wpercent = basewidth/float(im.size[0])
+		hsize = im.size[1]*wpercent
+		size_f = (basewidth, int(hsize))
+		im = im.resize(size_f, Image.NEAREST)
+
+		output = BytesIO()
+		im.save(fp=output, format='JPEG', quality=90)
+		self.image = InMemoryUploadedFile(output, 'ImageField', "%s.jpg" % self.image.name.split('.')[0], 'image/jpeg', sys.getsizeof(output), None)
+
+		super(House, self).save()
 
 	def __str__(self):
 		return self.name
