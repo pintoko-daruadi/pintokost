@@ -116,7 +116,7 @@ class HouseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 class HouseUpdateView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMixin, SuccessMessageMixin, UpdateView):
 	permission_required = 'house.change_house'
 	model = House
-	fields = ['name', 'address', 'pln_number']
+	fields = ['name', 'address', 'pln_number', 'image']
 	template_name = 'house/form.html'
 	success_url = reverse_lazy('house:list')
 	success_message = "Rumah %(name)s berhasil diperbarui"
