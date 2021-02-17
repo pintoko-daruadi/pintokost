@@ -145,7 +145,7 @@ class PaymentCreateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMess
 			'rent': self.rent,
 			'price': int(self.rent.price),
 			'pay_date': timezone.now(),
-			'start': datetime(self.kwargs.get('year'), self.kwargs.get('month'), 1)
+			'start': date(self.kwargs.get('year'), self.kwargs.get('month'), 1)
 		}
 
 	def get_context_data(self, **kwargs):
