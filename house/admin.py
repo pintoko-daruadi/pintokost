@@ -73,7 +73,7 @@ class HouseAdmin(admin.ModelAdmin):
 			if request.user.groups.filter(name='owner').count() > 0:
 				self.readonly_fields = ('owner',)
 		else:
-			self.readonly_fields = []
+			self.readonly_fields = ('village',)
 		form = super().get_form(request, obj, **kwargs)
 		return form
 
