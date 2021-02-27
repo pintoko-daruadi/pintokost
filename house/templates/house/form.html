@@ -2,6 +2,10 @@
 {% block title %}{{action}} Rumah{% endblock %}
 {% load crispy_forms_tags %}
 
+{% block css %}
+{{ form.media.css }}
+{% endblock %}
+
 {% block pagecontent %}
 	<h4>Form {{action}} Rumah Sewa</h4>
 	<form method="POST" enctype="multipart/form-data">
@@ -11,5 +15,26 @@
 	</form>
 {% endblock %}
 
-{% block sidecontent %}
+{% block javascript %}
+{{ form.media.js }}
+<script type="text/javascript">
+	$('#id_regency').on("select2:opening", function(e) {
+		if($('#id_province').val()==""){
+			alert('Pilih Provinsi terlebih dahulu')
+			return false;
+		}
+	});
+	$('#id_district').on("select2:opening", function(e) {
+		if($('#id_regency').val()==""){
+			alert('Pilih Kota/Kabupaten terlebih dahulu')
+			return false;
+		}
+	});
+	$('#id_village').on("select2:opening", function(e) {
+		if($('#id_district').val()==""){
+			alert('Pilih Kecamatan terlebih dahulu')
+			return false;
+		}
+	});
+</script>
 {% endblock %}
