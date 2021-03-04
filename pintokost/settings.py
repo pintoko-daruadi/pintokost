@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'django_select2',
     'crispy_forms',
     'house',
-    'profile'
+    'profile',
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [
