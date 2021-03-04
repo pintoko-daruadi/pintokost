@@ -13,7 +13,7 @@ from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 from datetime import date
-from .forms import LatepaymentForm, RentForm
+from .forms import LatepaymentForm, RentForm, HouseForm
 from .mixins import HouseOwnerMixin, HouseRentedMixin
 from .models import Payment, Rent, Expense, House
 from .helpers import toRupiah
@@ -116,7 +116,7 @@ class HouseListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 class HouseUpdateView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMixin, SuccessMessageMixin, UpdateView):
 	permission_required = 'house.change_house'
 	model = House
-	fields = ['name', 'address', 'pln_number', 'image']
+	form_class = HouseForm
 	template_name = 'house/form.html'
 	success_url = reverse_lazy('house:list')
 	success_message = "Rumah %(name)s berhasil diperbarui"
@@ -126,11 +126,6 @@ class HouseUpdateView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMix
 		context['menu_house'] = True
 		context['action'] = 'Ubah'
 		return context
-
-	def get_form(self, form_class=None):
-		form = super(HouseUpdateView, self).get_form(form_class)
-		form.fields['address'].widget = forms.Textarea()
-		return form
 
 class PaymentCreateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView):
 	model = Payment

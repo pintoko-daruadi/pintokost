@@ -3,6 +3,7 @@ from django.contrib.auth.models import User, Permission
 from django.db import models
 from django.utils import timezone
 from .helpers import toRupiah
+from indoplaces.models import Village
 import datetime, re, os
 
 def expense_path(instance, filename):
@@ -26,6 +27,7 @@ class House(models.Model):
 		limit_choices_to={'groups__name': 'owner'}
 	)
 	image = models.ImageField(null=True, blank=True, upload_to=house_dir, default='/static/default.jpg')
+	village = models.ForeignKey(Village, on_delete=models.SET_NULL, null=True)
 
 	def __str__(self):
 		return self.name

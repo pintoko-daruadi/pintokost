@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'house',
     'profile',
+    'indoplaces',
     'django_cleanup.apps.CleanupConfig',
 ]
 
