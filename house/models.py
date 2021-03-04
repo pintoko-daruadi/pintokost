@@ -33,7 +33,9 @@ class House(models.Model):
 	def image_url(self):
 		if self.image and hasattr(self.image, 'url'):
 			return self.image.url
-		return '/static/default.jpg'
+
+		from django.templatetags.static import static
+		return static('default.jpg')
 
 	def save(self):
 		from .helpers import resize_image
