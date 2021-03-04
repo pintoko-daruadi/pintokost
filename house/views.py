@@ -65,7 +65,7 @@ def latepayment(request):
 class HouseCreateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView):
 	permission_required = 'house.add_house'
 	model = House
-	fields = ('name', 'address', 'pln_number')
+	fields = ('name', 'address', 'pln_number', 'image')
 	template_name = 'house/form.html'
 	success_url = reverse_lazy('house:list')
 	success_message = "Rumah %(name)s berhasil ditambah"
