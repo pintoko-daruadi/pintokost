@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block pagecontent %}
-	<h4>Form {{action}} Rumah Sewa</h4>
+	<h4>{{action}} Rumah Sewa</h4>
 	<form method="POST" enctype="multipart/form-data">
 		{% csrf_token %}
 		{{ form | crispy }}

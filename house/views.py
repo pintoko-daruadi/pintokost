@@ -65,7 +65,7 @@ def latepayment(request):
 class HouseCreateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView):
 	permission_required = 'house.add_house'
 	model = House
-	fields = ('name', 'address', 'pln_number', 'image')
+	form_class = HouseForm
 	template_name = 'house/form.html'
 	success_url = reverse_lazy('house:list')
 	success_message = "Rumah %(name)s berhasil ditambah"
@@ -75,11 +75,6 @@ class HouseCreateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessag
 		context['menu_house'] = True
 		context['action'] = 'Tambah'
 		return context
-
-	def get_form(self, form_class=None):
-		form = super(HouseCreateView, self).get_form(form_class)
-		form.fields['address'].widget = forms.Textarea()
-		return form
 
 	def form_valid(self, form):
 		form.instance.owner = self.request.user
@@ -126,6 +121,14 @@ class HouseUpdateView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMix
 		context['menu_house'] = True
 		context['action'] = 'Ubah'
 		return context
+
+	def get_form(self, form_class=None):
+		form = super(HouseUpdateView, self).get_form(form_class)
+		if self.object.village and hasattr(self.object, 'village'):
+			form.fields['province'].initial = self.object.village.district.regency.province_id
+			form.fields['regency'].initial = self.object.village.district.regency_id
+			form.fields['district'].initial = self.object.village.district_id
+		return form
 
 class PaymentCreateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView):
 	model = Payment

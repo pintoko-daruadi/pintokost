@@ -17,6 +17,9 @@ class RenterWidget(s2forms.ModelSelect2Widget):
 		masked_nik = len(obj.profile.nik[:-4])*'#'+obj.profile.nik[-4:]
 		return str(obj.get_full_name()).upper() + " - <NIK: " + masked_nik + ">"
 
+	def build_attrs(self, base_attrs, extra_attrs):
+		return super().build_attrs(base_attrs, extra_attrs={"data-minimum-input-length": 4})
+
 class LatepaymentForm(forms.Form):
 	START_SAVE_DATA = 2021
 	years = [(x, str(x)) for x in range(START_SAVE_DATA, (date.today().year+1))]
@@ -37,52 +40,53 @@ class RentForm(forms.ModelForm):
 		super(RentForm, self).__init__(*args, **kwargs)
 		self.fields['price'].widget.attrs = {'step': '1000'}
 
+class BaseIndoPlace(s2forms.ModelSelect2Widget):
+	search_fields = ['name__icontains']
+	max_results = 2
+
+	def build_attrs(self, base_attrs, extra_attrs):
+		return super().build_attrs(base_attrs, extra_attrs={"data-minimum-input-length": 4})
+
 class HouseForm(forms.ModelForm):
 	province = forms.ModelChoiceField(
 		label='Provinsi',
 		required=False,
 		queryset=Province.objects.all(),
-		widget=s2forms.ModelSelect2Widget(
+		widget=BaseIndoPlace(
 			model=Province,
-			search_fields=['name__icontains'],
-			max_results=2
 		)
 	)
 	regency = forms.ModelChoiceField(
 		label='Kota/Kabupaten',
 		required=False,
 		queryset=Regency.objects.all(),
-		widget=s2forms.ModelSelect2Widget(
+		widget=BaseIndoPlace(
 			model=Regency,
-			search_fields=['name__icontains'],
 			dependent_fields={'province': 'province'},
-			max_results=2
 		),
 	)
 	district = forms.ModelChoiceField(
 		label='Kecamatan',
 		required=False,
 		queryset=District.objects.all(),
-		widget=s2forms.ModelSelect2Widget(
+		widget=BaseIndoPlace(
 			model=District,
-			search_fields=['name__icontains'],
 			dependent_fields={'regency': 'regency'},
-			max_results=2
 		),
 	)
 
 	class Meta:
 		model = House
-		fields = ['name', 'address', 'pln_number', 'image', 'province', 'regency', 'district', 'village']
+		fields = ['name', 'province', 'regency', 'district', 'village', 'address', 'pln_number', 'image']
 		widgets = {
 			'address': forms.Textarea(),
-			'village': s2forms.ModelSelect2Widget(
+			'village': BaseIndoPlace(
 				queryset=Village.objects.all(),
-				search_fields=['name__icontains'],
 				dependent_fields={'district': 'district'},
-				max_results=2
 			),
 		}
 		labels = {
+			'name': 'Nama Rumah',
+			'address': 'Alamat Lengkap',
 			'village': 'Kelurahan/Desa',
 		}
