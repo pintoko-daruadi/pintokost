@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'house',
     'profile',
     'indoplaces',
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [
