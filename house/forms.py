@@ -1,24 +1,56 @@
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Div, HTML
+from crispy_forms.bootstrap import PrependedText
 from django import forms
 from django.utils.dates import MONTHS
 from datetime import date
-from django_select2 import forms as s2forms
-from django.contrib.auth.models import User
 from .models import House, Rent
 from indoplaces.models import Province, Regency, District, Village
+from house.forms_widgets import RenterWidget, IndoPlaceWidget
 
-class RenterWidget(s2forms.ModelSelect2Widget):
-	queryset = User.objects.filter(groups__name='renter')
-	search_fields = [
-		'first_name__icontains',
-		'last_name__icontains',
-	]
+class HouseForm(forms.ModelForm):
+	province = forms.ModelChoiceField(
+		label='Provinsi',
+		required=False,
+		queryset=Province.objects.all(),
+		widget=IndoPlaceWidget(
+			model=Province,
+		)
+	)
+	regency = forms.ModelChoiceField(
+		label='Kota/Kabupaten',
+		required=False,
+		queryset=Regency.objects.all(),
+		widget=IndoPlaceWidget(
+			model=Regency,
+			dependent_fields={'province': 'province'},
+		),
+	)
+	district = forms.ModelChoiceField(
+		label='Kecamatan',
+		required=False,
+		queryset=District.objects.all(),
+		widget=IndoPlaceWidget(
+			model=District,
+			dependent_fields={'regency': 'regency'},
+		),
+	)
 
-	def label_from_instance(self, obj):
-		masked_nik = len(obj.profile.nik[:-4])*'#'+obj.profile.nik[-4:]
-		return str(obj.get_full_name()).upper() + " - <NIK: " + masked_nik + ">"
-
-	def build_attrs(self, base_attrs, extra_attrs):
-		return super().build_attrs(base_attrs, extra_attrs={"data-minimum-input-length": 4})
+	class Meta:
+		model = House
+		fields = ['name', 'province', 'regency', 'district', 'village', 'address', 'pln_number', 'image']
+		widgets = {
+			'address': forms.Textarea(),
+			'village': IndoPlaceWidget(
+				queryset=Village.objects.all(),
+				dependent_fields={'district': 'district'},
+			),
+		}
+		labels = {
+			'name': 'Nama Rumah',
+			'address': 'Alamat Lengkap',
+			'village': 'Kelurahan/Desa',
+		}
 
 class LatepaymentForm(forms.Form):
 	START_SAVE_DATA = 2021
@@ -27,6 +59,19 @@ class LatepaymentForm(forms.Form):
 
 	months = [(x, MONTHS[x]) for x in range(1, 13)]
 	month = forms.ChoiceField(choices=months)
+
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.helper = FormHelper()
+		self.helper.form_show_labels = False
+		self.helper.layout = Layout(
+			Div(
+				Div('year', css_class='col'),
+				Div('month', css_class='col px-0'),
+				Div(HTML('<button type="submit" class="btn btn-success"><i class="fa fa-search"></i>Cari</button>'), css_class='col'),
+				css_class='row'
+			)
+		)
 
 class RentForm(forms.ModelForm):
 	class Meta:
@@ -39,54 +84,3 @@ class RentForm(forms.ModelForm):
 	def __init__(self, *args, **kwargs):
 		super(RentForm, self).__init__(*args, **kwargs)
 		self.fields['price'].widget.attrs = {'step': '1000'}
-
-class BaseIndoPlace(s2forms.ModelSelect2Widget):
-	search_fields = ['name__icontains']
-	max_results = 2
-
-	def build_attrs(self, base_attrs, extra_attrs):
-		return super().build_attrs(base_attrs, extra_attrs={"data-minimum-input-length": 4})
-
-class HouseForm(forms.ModelForm):
-	province = forms.ModelChoiceField(
-		label='Provinsi',
-		required=False,
-		queryset=Province.objects.all(),
-		widget=BaseIndoPlace(
-			model=Province,
-		)
-	)
-	regency = forms.ModelChoiceField(
-		label='Kota/Kabupaten',
-		required=False,
-		queryset=Regency.objects.all(),
-		widget=BaseIndoPlace(
-			model=Regency,
-			dependent_fields={'province': 'province'},
-		),
-	)
-	district = forms.ModelChoiceField(
-		label='Kecamatan',
-		required=False,
-		queryset=District.objects.all(),
-		widget=BaseIndoPlace(
-			model=District,
-			dependent_fields={'regency': 'regency'},
-		),
-	)
-
-	class Meta:
-		model = House
-		fields = ['name', 'province', 'regency', 'district', 'village', 'address', 'pln_number', 'image']
-		widgets = {
-			'address': forms.Textarea(),
-			'village': BaseIndoPlace(
-				queryset=Village.objects.all(),
-				dependent_fields={'district': 'district'},
-			),
-		}
-		labels = {
-			'name': 'Nama Rumah',
-			'address': 'Alamat Lengkap',
-			'village': 'Kelurahan/Desa',
-		}

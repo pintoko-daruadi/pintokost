@@ -1,18 +1,19 @@
 {% extends 'house/base.html' %}
-{% block title %}Daftar Belum Bayar{% endblock %}
+{% block title %}Daftar Pembayaran{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="//stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+{% endblock %}
 {% block pagecontent %}
 	{% load crispy_forms_tags %}
-	<h3>Daftar Belum Bayar</h3>
+	<h3>Pembayaran</h3>
 	{% if messages %}
 		{% for message in messages %}
 		<div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
 		{% endfor %}
 	{% endif %}
-	<form method="post">
-		{% csrf_token %}
-		{{form | crispy}}
-		<input type="submit" name="submit" value="Submit" class="btn btn-primary">
-	</form>
+
+	{% crispy form %}
+
 	{% for rent in data %}
 		<div class="row my-2">
 			<div class="col-sm-8">
