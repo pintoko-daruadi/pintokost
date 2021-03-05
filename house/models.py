@@ -26,7 +26,7 @@ class House(models.Model):
 		on_delete=models.PROTECT,
 		limit_choices_to={'groups__name': 'owner'}
 	)
-	image = models.ImageField(null=True, blank=True, upload_to=house_dir, default='/static/default.jpg')
+	image = models.ImageField(null=True, blank=True, upload_to=house_dir)
 	village = models.ForeignKey(Village, on_delete=models.SET_NULL, null=True)
 
 	def __str__(self):
