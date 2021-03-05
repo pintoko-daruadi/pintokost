@@ -5,7 +5,7 @@
 {% endblock %}
 {% block pagecontent %}
 	{% load crispy_forms_tags %}
-	<h3>Pembayaran</h3>
+	<h5>Pembayaran</h5>
 	{% if messages %}
 		{% for message in messages %}
 		<div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
@@ -32,22 +32,24 @@
 			{% endfor %}
 		</ul>
 	{% empty %}
-		<h3>-</h3>
+		<h5><i>Oops, Belum ada data pencarian</i> <span class="fa fa-rocket"></span></h5>
 	{% endfor %}
 {% endblock %}
 
 {% block sidecontent %}
-<div class="card text-white bg-primary mb-3">
-	<div class="card-header">Transaksi {{ month }} {{ year }} </div>
-	<div class="card-body">
-		<h5 class="card-title">Uang Masuk:</h5>
-		<h4 class="card-title text-success">{{ income }}</h4>
-		<hr>
-		<h5 class="card-title">Uang Keluar:</h5>
-		<h4 class="card-title text-warning">{{ expense }}</h4>
-		<hr>
-		<h5 class="card-title">Total Kas:</h5>
-		<h4 class="card-title text-{{ balance_css_class }}">{{ balance }}</h4>
+	{% if show_sidecontent %}
+	<div class="card text-white bg-primary mb-3">
+		<div class="card-header">Transaksi {{ month }} {{ year }} </div>
+		<div class="card-body">
+			<h5 class="card-title">Uang Masuk:</h5>
+			<h4 class="card-title text-success">{{ income }}</h4>
+			<hr>
+			<h5 class="card-title">Uang Keluar:</h5>
+			<h4 class="card-title text-warning">{{ expense }}</h4>
+			<hr>
+			<h5 class="card-title">Total Kas:</h5>
+			<h4 class="card-title text-{{ balance_css_class }}">{{ balance }}</h4>
+		</div>
 	</div>
-</div>
+	{% endif %}
 {% endblock %}

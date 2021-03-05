@@ -52,7 +52,7 @@ class HouseForm(forms.ModelForm):
 			'village': 'Kelurahan/Desa',
 		}
 
-class LatepaymentForm(forms.Form):
+class PaymentListForm(forms.Form):
 	START_SAVE_DATA = 2021
 	years = [(x, str(x)) for x in range(START_SAVE_DATA, (date.today().year+1))]
 	year = forms.ChoiceField(choices=years)

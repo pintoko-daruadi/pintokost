@@ -13,40 +13,42 @@ from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 from datetime import date
-from .forms import LatepaymentForm, RentForm, HouseForm
+from .forms import PaymentListForm, RentForm, HouseForm
 from .mixins import HouseOwnerMixin, HouseRentedMixin
 from .models import Payment, Rent, Expense, House
 from .helpers import toRupiah
 
 def index(request):
-	return redirect(reverse_lazy('house:latepayment'))
+	return redirect(reverse_lazy('house:payment_list'))
 
 @login_required
-def latepayment(request):
+def payment_list(request):
+	show_sidecontent = False
 	month = date.today().month
 	year = date.today().year
 	not_paid_rent = {}
 	income = 0
 	expense = 0
 	balance = 0
-	form = LatepaymentForm(initial = {'year': year, 'month': month})
+	form = PaymentListForm(initial = {'year': year, 'month': month})
 
 	if request.method == "POST":
-		form = LatepaymentForm(request.POST)
+		form = PaymentListForm(request.POST)
 		if form.is_valid():
 			rent_ids = Payment.objects.filter(start__month=form.cleaned_data['month'], start__year=form.cleaned_data['year']).values_list('rent__id', flat=True)
-			not_paid_rent = Rent.objects.filter(active=True, start_date__lte=date(int(form.cleaned_data['year']), int(form.cleaned_data['month']), 15)).exclude(id__in = rent_ids).order_by('house')
+			not_paid_rent = Rent.objects.filter(house__owner=request.user, active=True, start_date__lte=date(int(form.cleaned_data['year']), int(form.cleaned_data['month']), 15)).exclude(id__in = rent_ids).order_by('house')
+
 			income = Payment.objects.filter(start__month=form.cleaned_data['month'], start__year=form.cleaned_data['year'])
 			expense = Expense.objects.filter(date__month=form.cleaned_data['month'], date__year=form.cleaned_data['year'])
-			if not request.user.is_superuser:
-				not_paid_rent = not_paid_rent.filter(house__owner=request.user)
-				income = income.filter(rent__house__owner=request.user)
-				expense = expense.filter(house__owner=request.user)
+
 			income = int(income.aggregate(Sum('price'))['price__sum'] or 0)
 			expense = int(expense.aggregate(Sum('nominal'))['nominal__sum'] or 0)
 			balance = income - expense
-			month = MONTHS[int(form.cleaned_data['month'])]
+			month = int(form.cleaned_data['month'])
 			year = form.cleaned_data['year']
+			show_sidecontent = True
+
+
 
 	data = {
 		'form': form,
@@ -55,9 +57,10 @@ def latepayment(request):
 		'expense': toRupiah(expense),
 		'balance': toRupiah(balance),
 		'balance_css_class': 'info' if balance > 0 else 'danger',
-		'month': month,
+		'month': MONTHS[month],
 		'year': year,
 		'menu_home': True,
+		'show_sidecontent': show_sidecontent,
 	}
 
 	return render(request, 'house/monthly_report.html', data)
@@ -157,7 +160,7 @@ class PaymentCreateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMess
 		return form
 
 	def get_success_url(self):
-		return reverse_lazy('house:latepayment')
+		return reverse_lazy('house:payment_list')
 
 	def form_valid(self, form):
 		form.instance.rent = self.rent
