@@ -73,6 +73,35 @@ class Rent(models.Model):
 		self.deleted_at = timezone.now()
 		self.save()
 
+	def get_paid_rent(house_owner, year, month):
+		payment = Payment.objects.filter(
+			rent__house__owner=house_owner,
+			rent__active=True,
+			start__year=year,
+			start__month=month,
+		)
+
+		return Rent.objects.filter(
+			house__owner=house_owner,
+			active=True,
+			id__in=payment.values_list('rent_id', flat=True)
+		)
+
+	def get_debt_rent(house_owner, year, month):
+		payment = Payment.objects.filter(
+			rent__house__owner=house_owner,
+			rent__active=True,
+			start__year=year,
+			start__month=month,
+		)
+
+		return Rent.objects.filter(
+			house__owner=house_owner,
+			active=True,
+			start_date__year__lte=year,
+			start_date__month__lte=month,
+		).exclude(id__in=payment.values_list('rent_id', flat=True))
+
 class Payment(models.Model):
 	rent = models.ForeignKey(Rent, on_delete=models.PROTECT)
 	price = models.DecimalField(max_digits=12, default=0, decimal_places=2, verbose_name='Harga')
