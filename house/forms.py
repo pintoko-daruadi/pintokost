@@ -53,8 +53,8 @@ class HouseForm(forms.ModelForm):
 		}
 
 class PaymentListForm(forms.Form):
-	START_SAVE_DATA = 2021
-	years = [(x, str(x)) for x in range(START_SAVE_DATA, (date.today().year+1))]
+	START_YEAR = 2021
+	years = [(x, str(x)) for x in range(START_YEAR, (date.today().year+1))]
 	year = forms.ChoiceField(choices=years)
 
 	months = [(x, MONTHS[x]) for x in range(1, 13)]

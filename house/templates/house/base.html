@@ -4,14 +4,15 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<title>{% block title %}{% endblock %} - Darusinau</title>
+		<title>{% block title %}{% endblock %} &raquo; Haven Darusinau</title>
 		<link href="{% static 'custom.min.css' %}" rel="stylesheet">
 		<link href="{% static 'bootstrap.flatly.css' %}" rel="stylesheet">
+		<link rel="stylesheet" href="//stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 		{% block css %}{% endblock %}
 	</head>
 	<body>
 		<nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
-			<a class="navbar-brand" href="/">Darusinau</a>
+			<a class="navbar-brand" href="/">DaruSinau</a>
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
 			</button>
@@ -19,9 +20,15 @@
 			{% if user.is_authenticated %}
 			<div class="collapse navbar-collapse" id="navbarColor01">
 				<ul class="navbar-nav mr-auto">
+					{% if perms.house.view_payment %}
+					<li class="nav-item {% if 0 %}active{% endif %}">
+						<a class="nav-link" href="{% url 'house:payment_list' %}"><i class="fa fa-usd"></i> Pembayaran</a>
+					</li>
+					{% endif %}
+
 					{% if perms.house.add_house %}
 					<li class="nav-item {% if menu_house %}active{% endif %}">
-						<a class="nav-link" href="{% url 'house:list' %}">Daftar Rumah {% if menu_house %}<span class="sr-only">(current)</span>{% endif %}</a>
+						<a class="nav-link" href="{% url 'house:list' %}"><i class="fa fa-building"></i> Rumah</a>
 					</li>
 					{% endif %}
 
@@ -30,15 +37,10 @@
 							<a href="{% url 'admin:index' %}" class="nav-link">Admin Page</a>
 						</li>
 					{% endif %}
-
-					<li class="nav-item">
-						<a href="{% url 'logout' %}" class="nav-link">Logout ({{request.user}})</a>
-					</li>
 				</ul>
-				<!-- <form class="form-inline my-2 my-lg-0">
-					<input class="form-control mr-sm-2" type="text" placeholder="Search">
-					<button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
-				</form> -->
+				<div class="my-1 my-lg-0">
+					<a href="{% url 'logout' %}" class="nav-link"><i class="fa fa-sign-out"></i> Logout</a>
+				</div>
 			</div>
 			{% endif %}
 		</nav>

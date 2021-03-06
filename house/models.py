@@ -81,7 +81,7 @@ class Rent(models.Model):
 			start__month=month,
 		)
 
-		return Rent.objects.filter(
+		return Rent.objects.select_related('renter').filter(
 			house__owner=house_owner,
 			active=True,
 			id__in=payment.values_list('rent_id', flat=True)
@@ -95,7 +95,7 @@ class Rent(models.Model):
 			start__month=month,
 		)
 
-		return Rent.objects.filter(
+		return Rent.objects.select_related('renter').filter(
 			house__owner=house_owner,
 			active=True,
 			start_date__year__lte=year,
@@ -110,6 +110,15 @@ class Payment(models.Model):
 
 	def __str__(self):
 		return "%s/%s (%s)" % (self.rent.house.name, self.start, self.rent.renter)
+
+	def monthly_income(owner, year, month):
+		qs = Payment.objects.filter(
+			rent__house__owner=owner,
+			start__year=year,
+			start__month=month,
+		).aggregate(models.Sum('price'))
+
+		return int(qs['price__sum'] or 0)
 
 class ExpenseType(models.Model):
 	name = models.CharField('Tipe Pengeluaran', max_length=50)
@@ -132,3 +141,12 @@ class Expense(models.Model):
 
 	def __str__(self):
 		return "%s <%s> (%s)" % (self.expense_type, toRupiah(self.nominal), self.house)
+
+	def monthly_outcome(owner, year, month):
+		qs = Expense.objects.filter(
+			house__owner=owner,
+			date__year=year,
+			date__month=month,
+		).aggregate(models.Sum('nominal'))
+
+		return int(qs['nominal__sum'] or 0)
