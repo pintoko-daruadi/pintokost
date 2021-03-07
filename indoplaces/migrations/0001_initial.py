@@ -18,6 +18,7 @@ class Migration(migrations.Migration):
                 ('id', models.PositiveIntegerField(primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=30, verbose_name='Nama')),
             ],
+            options={'ordering': ['id']},
         ),
         migrations.CreateModel(
             name='Regency',
@@ -26,6 +27,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=50, verbose_name='Nama')),
                 ('province', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='indoplaces.province')),
             ],
+            options={'ordering': ['id']},
         ),
         migrations.CreateModel(
             name='District',
@@ -34,6 +36,7 @@ class Migration(migrations.Migration):
                 ('regency', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='indoplaces.regency')),
                 ('name', models.CharField(max_length=50, verbose_name='Nama')),
             ],
+            options={'ordering': ['id']},
         ),
         migrations.CreateModel(
             name='Village',
@@ -42,5 +45,6 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=50, verbose_name='Nama')),
                 ('district', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='indoplaces.district')),
             ],
+            options={'ordering': ['id']},
         ),
     ]

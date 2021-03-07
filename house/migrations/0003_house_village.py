@@ -12,6 +12,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RenameField(
+            model_name='payment',
+            old_name='price',
+            new_name='nominal',
+        ),
         migrations.AddField(
             model_name='house',
             name='village',

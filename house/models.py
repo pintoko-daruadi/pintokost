@@ -103,7 +103,7 @@ class Rent(models.Model):
 
 class Payment(models.Model):
 	rent = models.ForeignKey(Rent, on_delete=models.PROTECT)
-	price = models.DecimalField(max_digits=12, default=0, decimal_places=2, verbose_name='Harga')
+	nominal = models.DecimalField(max_digits=12, default=0, decimal_places=2, verbose_name='Harga')
 	pay_date = models.DateField('Tanggal Bayar', default=None, help_text='Format: YYYY-MM-DD')
 	start = models.DateField('Mulai Sewa', default=None, help_text='Format: YYYY-MM-DD')
 
@@ -115,9 +115,9 @@ class Payment(models.Model):
 			rent__house__owner=owner,
 			start__year=year,
 			start__month=month,
-		).aggregate(models.Sum('price'))
+		).aggregate(models.Sum('nominal'))
 
-		return int(qs['price__sum'] or 0)
+		return int(qs['nominal__sum'] or 0)
 
 	def kuitansi_obj(renter_username, year, month):
 		return Payment.objects.select_related('rent__house__owner').get(rent__renter__username=renter_username, start__year=year, start__month=month)
