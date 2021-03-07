@@ -1,0 +1,66 @@
+{% extends 'house/base.html' %}
+{% block title %}Pembayaran{% endblock %}
+
+{% block pagecontent %}
+	{% load crispy_forms_tags %}
+	<h5>Pembayaran</h5>
+	{% if messages %}
+		{% for message in messages %}
+		<div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+		{% endfor %}
+	{% endif %}
+
+	{% crispy form %}
+
+  {% if paid %}
+  <h5 class="font-weight-bold">Lunas</h5>
+  {% endif %}
+
+	{% for rent in paid %}
+		<div class="row">
+			<div class="col-sm-8">
+				<div class="card-block">
+						<h4 class="card-title"><i class="fa fa-home" style="color: var(--blue)"></i> {{ rent.house.name }}</h4>
+						<p><i class="fa fa-user" style="color: var(--cyan)"></i> {{rent.renter.get_full_name}} &rsaquo; <i class="fa fa-whatsapp" style="color: var(--green)"></i> {{rent.renter.profile.phone}}</p>
+						<a href="{% url 'kuitansi' year month rent.renter.username %}" class="btn btn-success btn-sm" target="_blank"><i class="fa fa-file-text"></i> Kwitansi</a>
+				</div>
+			</div>
+		</div>
+	{% empty %}
+		<h5><i style="color: var(--red)">Oops, Sepertinya belum ada data pembayaran</i> <span class="fa fa-rocket" style="color: orange"></span></h5>
+	{% endfor %}
+
+	<br>
+  {% if debt %}
+  <h5 class="font-weight-bold">Piutang</h5>
+  {% endif %}
+	{% for rent in debt %}
+		<div class="row">
+			<div class="col-sm-8">
+				<div class="card-block">
+						<h4 class="card-title"><i class="fa fa-home" style="color: var(--blue)"></i> {{ rent.house.name }}</h4>
+						<p><i class="fa fa-user" style="color: var(--cyan)"></i> {{rent.renter.get_full_name}} &rsaquo; <i class="fa fa-whatsapp" style="color: var(--green)"></i> {{rent.renter.profile.phone}}</p>
+						<a href="{% url 'house:pay' rent.id form.year.value form.month.value %}" class="btn btn-warning btn-sm"><i class="fa fa-plus-circle"></i> Catat</a>
+				</div>
+			</div>
+		</div>
+	{% empty %}
+		<h5 style="color: teal"><i>Wah, sepertinya semua pembayaran sudah selesai</i> <span class="fa fa-child" style="color: orange"></span></h5>
+	{% endfor %}
+{% endblock %}
+
+{% block sidecontent %}
+<div class="card text-white bg-primary mb-3">
+	<div class="card-header">Transaksi {{ month_name }} {{ year }} </div>
+	<div class="card-body">
+		<h5 class="card-title">Uang Masuk:</h5>
+		<h4 class="card-title text-success">{{ income }}</h4>
+		<hr>
+		<h5 class="card-title">Uang Keluar:</h5>
+		<h4 class="card-title text-warning">{{ expense }}</h4>
+		<hr>
+		<h5 class="card-title">Total Kas:</h5>
+		<h4 class="card-title text-{{ balance_css_class }}">{{ balance }}</h4>
+	</div>
+</div>
+{% endblock %}

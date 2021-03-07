@@ -9,9 +9,9 @@
                 <form method="POST" autocomplete="off">
                 	{% csrf_token %}
                     {{ form|crispy }}
-                    <button type="submit" id="sendlogin" class="btn btn-primary">Login</button>
+                    <button type="submit" id="sendlogin" class="btn btn-primary"><i class="fa fa-sign-in"></i> Login</button>
                     &nbsp
-                    <a href="{% url 'profile:landlord_new' %}" class="btn btn-success">Daftar</a>
+                    <a href="{% url 'profile:landlord_new' %}" class="btn btn-success"><i class="fa fa-wpforms"></i> Daftar</a>
                 </form>
             </div>
         </div>

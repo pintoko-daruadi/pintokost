@@ -1,0 +1,33 @@
+{% extends 'house/base_unauth.html' %}
+{% block title %}Bukti Pembayaran{% endblock %}
+
+{% block pagecontent %}
+<h4>Bukti Pembayaran</h4>
+<div class="card-block">
+  <dl>
+    <dt><i class="fa fa-calendar"style="color: var(--purple)"></i> Periode</dt>
+    <dd>{{month_name}} {{payment.start.year}}</dd>
+  </dl>
+  <dl>
+    <dt><i class="fa fa-address-book"style="color: var(--dark)"></i> Penyewa</dt>
+    <dd>{{payment.rent.renter.get_full_name}}</dd>
+  </dl>
+  <dl>
+    <dt><i class="fa fa-home" style="color: var(--blue)"></i> Nama Rumah</dt>
+    <dd>{{ payment.rent.house.name }}</dd>
+  </dl>
+  <dl>
+    <dt><i class="fa fa-map-marker"style="color: var(--yellow)"></i> Lokasi Rumah</dt>
+    <dd>{{payment.rent.house.village|default_if_none:"-"}}</dd>
+  </dl>
+  <dl>
+    <dt><i class="fa fa-vcard"style="color: var(--red)"></i> Pemilik Rumah</dt>
+    <dd>{{payment.rent.house.owner}}</dd>
+  </dl>
+  <dl>
+    <dt><i class="fa fa-calendar-check-o"style="color: var(--green)"></i> Tanggal Bayar</dt>
+    <dd>{{payment.pay_date}}</dd>
+  </dl>
+  <p>Terima kasih atas pembayaran Anda 🙏</p>
+</div
+{% endblock %}

@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'house',
     'profile',
+    'indoplaces',
     'django_cleanup.apps.CleanupConfig',
 ]
 
@@ -63,7 +64,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'pintokost.urls'
 
 LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/house/latepayment/'
+LOGIN_REDIRECT_URL = '/'
 
 TEMPLATES = [
     {
