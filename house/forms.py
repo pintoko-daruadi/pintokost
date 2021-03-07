@@ -1,6 +1,5 @@
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Div, HTML
-from crispy_forms.bootstrap import PrependedText
 from django import forms
 from django.utils.dates import MONTHS
 from datetime import date
