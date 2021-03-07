@@ -102,6 +102,7 @@ class KuitansiView(DetailView):
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data()
 		context['month_name'] = MONTHS[int(self.get_object().start.month)]
+		context['nominal'] = toRupiah(self.get_object().nominal)
 		return context
 
 class PaymentCreateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView):
