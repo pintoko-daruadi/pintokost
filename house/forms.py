@@ -68,7 +68,7 @@ class PaymentListForm(forms.Form):
 			Div(
 				Div('year', css_class='col'),
 				Div('month', css_class='col px-0'),
-				Div(HTML('<button type="submit" class="btn btn-success"><i class="fa fa-search"></i>Cari</button>'), css_class='col'),
+				Div(HTML('<button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> Cari</button>'), css_class='col'),
 				css_class='row'
 			)
 		)
