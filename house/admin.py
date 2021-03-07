@@ -73,7 +73,7 @@ class HouseAdmin(admin.ModelAdmin):
 			if request.user.groups.filter(name='owner').count() > 0:
 				self.readonly_fields = ('owner',)
 		else:
-			self.readonly_fields = []
+			self.readonly_fields = ('village',)
 		form = super().get_form(request, obj, **kwargs)
 		return form
 
@@ -141,8 +141,8 @@ class HouseListFilter(admin.SimpleListFilter):
 class PaymentAdmin(admin.ModelAdmin):
 	list_display = ('house_name', 'penyewa', 'start', 'pay_date', 'billing_date', 'harga', 'owner')
 	ordering = ('rent__house__name','-start',)
-	readonly_fields = ('price',)
-	fields = ('rent', 'price', 'pay_date', 'start')
+	readonly_fields = ('nominal',)
+	fields = ('rent', 'nominal', 'pay_date', 'start')
 	list_filter = (MonthListFilter, YearListFilter, HouseListFilter)
 
 	def billing_date(self, obj):
@@ -156,7 +156,7 @@ class PaymentAdmin(admin.ModelAdmin):
 		return obj.rent.house.owner
 
 	def harga(self, obj):
-		return "%s" % toRupiah(obj.price)
+		return "%s" % toRupiah(obj.nominal)
 	harga.admin_order_field = 'price'
 
 	def get_queryset(self, request):

@@ -3,6 +3,7 @@ from django.contrib.auth.models import User, Permission
 from django.db import models
 from django.utils import timezone
 from .helpers import toRupiah
+from indoplaces.models import Village
 import datetime, re, os
 
 def expense_path(instance, filename):
@@ -25,7 +26,8 @@ class House(models.Model):
 		on_delete=models.PROTECT,
 		limit_choices_to={'groups__name': 'owner'}
 	)
-	image = models.ImageField(null=True, blank=True, upload_to=house_dir, default='/static/default.jpg')
+	image = models.ImageField(null=True, blank=True, upload_to=house_dir)
+	village = models.ForeignKey(Village, on_delete=models.SET_NULL, null=True)
 
 	def __str__(self):
 		return self.name
@@ -71,14 +73,54 @@ class Rent(models.Model):
 		self.deleted_at = timezone.now()
 		self.save()
 
+	def get_paid_rent(house_owner, year, month):
+		payment = Payment.objects.filter(
+			rent__house__owner=house_owner,
+			rent__active=True,
+			start__year=year,
+			start__month=month,
+		)
+
+		return Rent.objects.select_related('renter').filter(
+			house__owner=house_owner,
+			active=True,
+			id__in=payment.values_list('rent_id', flat=True)
+		)
+
+	def get_debt_rent(house_owner, year, month):
+		payment = Payment.objects.filter(
+			rent__house__owner=house_owner,
+			rent__active=True,
+			start__year=year,
+			start__month=month,
+		)
+
+		return Rent.objects.select_related('renter').filter(
+			house__owner=house_owner,
+			active=True,
+			start_date__lte=datetime.date(int(year), int(month), 15), #ambil pengontrak yg mulai dibawah tanggal 15
+		).exclude(id__in=payment.values_list('rent_id', flat=True))
+
 class Payment(models.Model):
 	rent = models.ForeignKey(Rent, on_delete=models.PROTECT)
-	price = models.DecimalField(max_digits=12, default=0, decimal_places=2, verbose_name='Harga')
+	nominal = models.DecimalField(max_digits=12, default=0, decimal_places=2, verbose_name='Harga')
 	pay_date = models.DateField('Tanggal Bayar', default=None, help_text='Format: YYYY-MM-DD')
 	start = models.DateField('Mulai Sewa', default=None, help_text='Format: YYYY-MM-DD')
 
 	def __str__(self):
 		return "%s/%s (%s)" % (self.rent.house.name, self.start, self.rent.renter)
+
+	def monthly_income(owner, year, month):
+		qs = Payment.objects.filter(
+			rent__house__owner=owner,
+			start__year=year,
+			start__month=month,
+		).aggregate(models.Sum('nominal'))
+
+		return int(qs['nominal__sum'] or 0)
+
+	def kuitansi_obj(renter_username, year, month):
+		return Payment.objects.select_related('rent__house__owner').get(rent__renter__username=renter_username, start__year=year, start__month=month)
 
 class ExpenseType(models.Model):
 	name = models.CharField('Tipe Pengeluaran', max_length=50)
@@ -101,3 +143,12 @@ class Expense(models.Model):
 
 	def __str__(self):
 		return "%s <%s> (%s)" % (self.expense_type, toRupiah(self.nominal), self.house)
+
+	def monthly_outcome(owner, year, month):
+		qs = Expense.objects.filter(
+			house__owner=owner,
+			date__year=year,
+			date__month=month,
+		).aggregate(models.Sum('nominal'))
+
+		return int(qs['nominal__sum'] or 0)

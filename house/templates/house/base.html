@@ -4,14 +4,15 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<title>{% block title %}{% endblock %} - Pintokost</title>
+		<title>{% block title %}{% endblock %} &raquo; Haven DaruSinau</title>
 		<link href="{% static 'custom.min.css' %}" rel="stylesheet">
 		<link href="{% static 'bootstrap.flatly.css' %}" rel="stylesheet">
+		<link rel="stylesheet" href="//stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 		{% block css %}{% endblock %}
 	</head>
 	<body>
 		<nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
-			<a class="navbar-brand" href="/">Daruadi - Catatan KTRK</a>
+			<a class="navbar-brand" href="/">DaruSinau</a>
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
 			</button>
@@ -19,9 +20,15 @@
 			{% if user.is_authenticated %}
 			<div class="collapse navbar-collapse" id="navbarColor01">
 				<ul class="navbar-nav mr-auto">
+					{% if perms.house.view_payment %}
+					<li class="nav-item {% if menu_pembayaran %}active{% endif %}">
+						<a class="nav-link" href="{% url 'house:payment_list' %}"><i class="fa fa-usd"></i> Pembayaran</a>
+					</li>
+					{% endif %}
+
 					{% if perms.house.add_house %}
 					<li class="nav-item {% if menu_house %}active{% endif %}">
-						<a class="nav-link" href="{% url 'house:list' %}">Data Rumah {% if menu_house %}<span class="sr-only">(current)</span>{% endif %}</a>
+						<a class="nav-link" href="{% url 'house:list' %}"><i class="fa fa-building"></i> Bangunan</a>
 					</li>
 					{% endif %}
 
@@ -30,15 +37,10 @@
 							<a href="{% url 'admin:index' %}" class="nav-link">Admin Page</a>
 						</li>
 					{% endif %}
-
-					<li class="nav-item">
-						<a href="{% url 'logout' %}" class="nav-link">Logout ({{request.user}})</a>
-					</li>
 				</ul>
-				<!-- <form class="form-inline my-2 my-lg-0">
-					<input class="form-control mr-sm-2" type="text" placeholder="Search">
-					<button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
-				</form> -->
+				<div class="my-1 my-lg-0">
+					<a href="{% url 'logout' %}" class="nav-link"><i class="fa fa-sign-out"></i> Keluar</a>
+				</div>
 			</div>
 			{% endif %}
 		</nav>
@@ -54,8 +56,8 @@
 				</div>
 			</div>
 		</div>
-		<script type="text/javascript" src="{% static 'jquery/jquery-3.4.1.min.js' %}"></script>
-		<script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+		<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js" integrity="sha384-LtrjvnR4Twt/qOuYxE721u19sVFLVSA4hf/rRt6PrZTmiPltdZcI7q7PXQBYTKyf" crossorigin="anonymous"></script>
 		{% block javascript %}{% endblock %}
 	</body>
 </html>
