@@ -120,6 +120,9 @@ class Payment(models.Model):
 
 		return int(qs['price__sum'] or 0)
 
+	def kuitansi_obj(renter_username, year, month):
+		return Payment.objects.select_related('rent__house__owner').get(rent__renter__username=renter_username, start__year=year, start__month=month)
+
 class ExpenseType(models.Model):
 	name = models.CharField('Tipe Pengeluaran', max_length=50)
 	owner = models.ForeignKey(

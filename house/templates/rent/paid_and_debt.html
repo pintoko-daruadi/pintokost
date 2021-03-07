@@ -13,70 +13,54 @@
 	{% crispy form %}
 
   {% if paid %}
-  <h5>Pembayaran Lunas</h5>
+  <h5 class="font-weight-bold">Lunas</h5>
   {% endif %}
+
 	{% for rent in paid %}
-		<div class="row my-2">
+		<div class="row">
 			<div class="col-sm-8">
-				{{ rent.house.name }} >> {{rent.renter.get_full_name}} [{{rent.renter.profile.phone}}] <span class="badge badge-info">tgl: {{rent.billing_date|date:"d"}}</span>
-			</div>
-			<div class="col-sm-4">
-				<a href="{% url 'house:pay' rent.id form.year.value form.month.value %}" class="btn btn-primary btn-sm">Catat Pembayaran</a>
+				<div class="card-block">
+						<h4 class="card-title"><i class="fa fa-home" style="color: var(--blue)"></i> {{ rent.house.name }}</h4>
+						<p><i class="fa fa-user" style="color: var(--cyan)"></i> {{rent.renter.get_full_name}} &rsaquo; <i class="fa fa-whatsapp" style="color: var(--green)"></i> {{rent.renter.profile.phone}}</p>
+						<a href="{% url 'kuitansi' year month rent.renter.username %}" class="btn btn-success btn-sm"><i class="fa fa-file-text"></i> Kwitansi</a>
+				</div>
 			</div>
 		</div>
-		<ul style="list-style-type: square;">
-			{% for children in rent.renter.children.all %}
-			<li>
-				{{ children }}
-				<p><img src="{{ children.get_photo_ktp }}" width="250px"></p>
-			</li>
-			{% endfor %}
-		</ul>
 	{% empty %}
-		<h5><i style="color: #E74C3C">Uups, Sepertinya belum ada data pembayaran</i> <span class="fa fa-rocket" style="color: orange"></span></h5>
+		<h5><i style="color: var(--red)">Oops, Sepertinya belum ada data pembayaran</i> <span class="fa fa-rocket" style="color: orange"></span></h5>
 	{% endfor %}
 
-  <hr>
-
+	<br>
   {% if debt %}
-  <h5>Belum Terbayar</h5>
+  <h5 class="font-weight-bold">Piutang</h5>
   {% endif %}
 	{% for rent in debt %}
-		<div class="row my-2">
+		<div class="row">
 			<div class="col-sm-8">
-				{{ rent.house.name }} >> {{rent.renter.get_full_name}} [{{rent.renter.profile.phone}}] <span class="badge badge-info">tgl: {{rent.billing_date|date:"d"}}</span>
-			</div>
-			<div class="col-sm-4">
-				<a href="{% url 'house:pay' rent.id form.year.value form.month.value %}" class="btn btn-primary btn-sm">Catat Pembayaran</a>
+				<div class="card-block">
+						<h4 class="card-title"><i class="fa fa-home" style="color: var(--blue)"></i> {{ rent.house.name }}</h4>
+						<p><i class="fa fa-user" style="color: var(--cyan)"></i> {{rent.renter.get_full_name}} &rsaquo; <i class="fa fa-whatsapp" style="color: var(--green)"></i> {{rent.renter.profile.phone}}</p>
+						<a href="{% url 'house:pay' rent.id form.year.value form.month.value %}" class="btn btn-warning btn-sm"><i class="fa fa-plus-circle"></i> Catat</a>
+				</div>
 			</div>
 		</div>
-		<ul style="list-style-type: square;">
-			{% for children in rent.renter.children.all %}
-			<li>
-				{{ children }}
-				<p><img src="{{ children.get_photo_ktp }}" width="250px"></p>
-			</li>
-			{% endfor %}
-		</ul>
 	{% empty %}
 		<h5 style="color: teal"><i>Wah, sepertinya semua pembayaran sudah selesai</i> <span class="fa fa-child" style="color: orange"></span></h5>
 	{% endfor %}
 {% endblock %}
 
 {% block sidecontent %}
-	{% if show_sidecontent %}
-	<div class="card text-white bg-primary mb-3">
-		<div class="card-header">Transaksi {{ month }} {{ year }} </div>
-		<div class="card-body">
-			<h5 class="card-title">Uang Masuk:</h5>
-			<h4 class="card-title text-success">{{ income }}</h4>
-			<hr>
-			<h5 class="card-title">Uang Keluar:</h5>
-			<h4 class="card-title text-warning">{{ expense }}</h4>
-			<hr>
-			<h5 class="card-title">Total Kas:</h5>
-			<h4 class="card-title text-{{ balance_css_class }}">{{ balance }}</h4>
-		</div>
+<div class="card text-white bg-primary mb-3">
+	<div class="card-header">Transaksi {{ month_name }} {{ year }} </div>
+	<div class="card-body">
+		<h5 class="card-title">Uang Masuk:</h5>
+		<h4 class="card-title text-success">{{ income }}</h4>
+		<hr>
+		<h5 class="card-title">Uang Keluar:</h5>
+		<h4 class="card-title text-warning">{{ expense }}</h4>
+		<hr>
+		<h5 class="card-title">Total Kas:</h5>
+		<h4 class="card-title text-{{ balance_css_class }}">{{ balance }}</h4>
 	</div>
-	{% endif %}
+</div>
 {% endblock %}

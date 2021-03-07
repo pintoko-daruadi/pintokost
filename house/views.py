@@ -3,12 +3,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.utils.dates import MONTHS
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, DetailView
 from django.views.generic.edit import CreateView, FormView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 from datetime import date
@@ -88,6 +88,22 @@ class HouseUpdateView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMix
 			form.fields['district'].initial = self.object.village.district_id
 		return form
 
+class KuitansiViews(DetailView):
+	model=Payment
+	pk_url_kwarg = 'renter'
+	template_name = 'house/kuitansi.html'
+
+	def get_object(self):
+		try:
+			return Payment.kuitansi_obj(self.kwargs.get('renter'), self.kwargs.get('year'), self.kwargs.get('month'))
+		except Exception as e:
+			raise Http404(e)
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data()
+		context['month_name'] = MONTHS[int(self.get_object().start.month)]
+		return context
+
 class PaymentCreateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView):
 	fields = ['price', 'pay_date', 'start']
 	model = Payment
@@ -164,28 +180,31 @@ class RentPaymentView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
 	permission_required = 'house.view_rent'
 	template_name = 'rent/paid_and_debt.html'
 
-	def form_valid(self, form):
-		context = self.get_context_data()
-		context['show_sidecontent'] = True
-		context['month'] = MONTHS[int(form.cleaned_data['month'])]
-		context['year'] = form.cleaned_data['year']
-		context['debt'] = Rent.get_debt_rent(self.request.user, form.cleaned_data['year'], form.cleaned_data['month'])
-		context['paid'] = Rent.get_paid_rent(self.request.user, form.cleaned_data['year'], form.cleaned_data['month'])
-		income = Payment.monthly_income(self.request.user, form.cleaned_data['year'], form.cleaned_data['month'])
+	def build_data_context(self, context, year, month):
+		context['menu_pembayaran'] = True
+		context['month'] = month
+		context['month_name'] = MONTHS[int(month)]
+		context['year'] = year
+		context['debt'] = Rent.get_debt_rent(self.request.user, year, month)
+		context['paid'] = Rent.get_paid_rent(self.request.user, year, month)
+		income = Payment.monthly_income(self.request.user, year, month)
 		context['income'] = toRupiah(income)
-		expense = Expense.monthly_outcome(self.request.user, form.cleaned_data['year'], form.cleaned_data['month'])
+		expense = Expense.monthly_outcome(self.request.user, year, month)
 		context['expense'] = toRupiah(expense)
 		balance = income - expense
 		context['balance'] = toRupiah(balance)
 		context['balance_css_class'] = 'info' if balance > 0 else 'danger'
+		return context
+
+	def form_valid(self, form):
+		context = self.get_context_data()
+		context = self.build_data_context(context, form.cleaned_data['year'], form.cleaned_data['month'])
 		return super(RentPaymentView, self).render_to_response(context)
 
 	def get_context_data(self, **kwargs):
 		context = super(RentPaymentView, self).get_context_data(**kwargs)
-		context['menu_home'] = True
 		today = date.today()
-		context['debt'] = Rent.get_debt_rent(self.request.user, today.year, today.month)
-		context['paid'] = Rent.get_paid_rent(self.request.user, today.year, today.month)
+		context = self.build_data_context(context,today.year, today.month)
 		return context
 
 	def get_initial(self):

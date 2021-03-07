@@ -21,14 +21,14 @@
 			<div class="collapse navbar-collapse" id="navbarColor01">
 				<ul class="navbar-nav mr-auto">
 					{% if perms.house.view_payment %}
-					<li class="nav-item {% if 0 %}active{% endif %}">
+					<li class="nav-item {% if menu_pembayaran %}active{% endif %}">
 						<a class="nav-link" href="{% url 'house:payment_list' %}"><i class="fa fa-usd"></i> Pembayaran</a>
 					</li>
 					{% endif %}
 
 					{% if perms.house.add_house %}
 					<li class="nav-item {% if menu_house %}active{% endif %}">
-						<a class="nav-link" href="{% url 'house:list' %}"><i class="fa fa-building"></i> Rumah</a>
+						<a class="nav-link" href="{% url 'house:list' %}"><i class="fa fa-building"></i> Bangunan</a>
 					</li>
 					{% endif %}
 
