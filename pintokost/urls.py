@@ -24,7 +24,7 @@ urlpatterns = [
     path('', house_views.index),
     path('admin/', admin.site.urls),
     path('house/', include('house.urls', namespace='house')),
-    path('k/<int:year>/<int:month>/<str:renter>', house_views.KuitansiViews.as_view(), name='kuitansi'),
+    path('k/<int:year>/<int:month>/<str:renter>', house_views.KuitansiView.as_view(), name='kuitansi'),
     path('login/', auth_views.LoginView.as_view(template_name='house/login.html', redirect_authenticated_user=True), name='login'),
     path('logout/', auth_views.logout_then_login, name='logout'),
     path('profile/', include('profile.urls', namespace='profile')),

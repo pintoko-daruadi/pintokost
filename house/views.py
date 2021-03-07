@@ -88,7 +88,7 @@ class HouseUpdateView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMix
 			form.fields['district'].initial = self.object.village.district_id
 		return form
 
-class KuitansiViews(DetailView):
+class KuitansiView(DetailView):
 	model=Payment
 	pk_url_kwarg = 'renter'
 	template_name = 'house/kuitansi.html'
