@@ -98,8 +98,7 @@ class Rent(models.Model):
 		return Rent.objects.select_related('renter').filter(
 			house__owner=house_owner,
 			active=True,
-			start_date__year__lte=year,
-			start_date__month__lte=month,
+			start_date__lte=datetime.date(year, month, 15), #ambil pengontrak yg mulai dibawah tanggal 15
 		).exclude(id__in=payment.values_list('rent_id', flat=True))
 
 class Payment(models.Model):
