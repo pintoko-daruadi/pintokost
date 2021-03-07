@@ -22,7 +22,7 @@
 				<div class="card-block">
 						<h4 class="card-title"><i class="fa fa-home" style="color: var(--blue)"></i> {{ rent.house.name }}</h4>
 						<p><i class="fa fa-user" style="color: var(--cyan)"></i> {{rent.renter.get_full_name}} &rsaquo; <i class="fa fa-whatsapp" style="color: var(--green)"></i> {{rent.renter.profile.phone}}</p>
-						<a href="{% url 'kuitansi' year month rent.renter.username %}" class="btn btn-success btn-sm"><i class="fa fa-file-text"></i> Kwitansi</a>
+						<a href="{% url 'kuitansi' year month rent.renter.username %}" class="btn btn-success btn-sm" target="_blank"><i class="fa fa-file-text"></i> Kwitansi</a>
 				</div>
 			</div>
 		</div>
