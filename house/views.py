@@ -106,7 +106,7 @@ class KuitansiView(DetailView):
 		return context
 
 class PaymentCreateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView):
-	fields = ['price', 'pay_date', 'start']
+	fields = ['nominal', 'pay_date', 'start']
 	model = Payment
 	permission_required = 'house.add_payment'
 	rent = None
@@ -117,7 +117,7 @@ class PaymentCreateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMess
 		self.rent = get_object_or_404(Rent, id=self.kwargs.get('pk'), house__owner=self.request.user)
 		return {
 			'rent': self.rent,
-			'price': int(self.rent.price),
+			'nominal': int(self.rent.price),
 			'pay_date': timezone.now(),
 			'start': date(self.kwargs.get('year'), self.kwargs.get('month'), 1)
 		}
@@ -129,7 +129,7 @@ class PaymentCreateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMess
 
 	def get_form(self, form_class=None):
 		form = super(PaymentCreateView, self).get_form(form_class)
-		form.fields['price'].widget.attrs = {'step': 1000}
+		form.fields['nominal'].widget.attrs = {'step': 1000}
 		return form
 
 	def form_valid(self, form):
