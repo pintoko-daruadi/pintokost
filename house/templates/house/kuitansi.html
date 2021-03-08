@@ -18,7 +18,7 @@
   </dl>
   <dl>
     <dt><i class="fa fa-map-marker"style="color: var(--yellow)"></i> Lokasi Rumah</dt>
-    <dd>{{payment.rent.house.village|default_if_none:"-"}}</dd>
+    <dd>{{payment.rent.house.village|default_if_none:"-"}}. [{{payment.rent.house.address|slice:":20"}}...]</dd>
   </dl>
   <dl>
     <dt><i class="fa fa-vcard"style="color: var(--red)"></i> Pemilik Rumah</dt>
