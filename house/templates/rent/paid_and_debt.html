@@ -16,13 +16,15 @@
   <h5 class="font-weight-bold">Lunas</h5>
   {% endif %}
 
-	{% for rent in paid %}
+	{% for payment in paid %}
 		<div class="row">
 			<div class="col-sm-8">
 				<div class="card-block">
-						<h4 class="card-title"><i class="fa fa-home" style="color: var(--blue)"></i> {{ rent.house.name }}</h4>
-						<p><i class="fa fa-user" style="color: var(--cyan)"></i> {{rent.renter.get_full_name}} &rsaquo; <i class="fa fa-whatsapp" style="color: var(--green)"></i> {{rent.renter.profile.phone}}</p>
-						<a href="{% url 'kuitansi' year month rent.renter.username %}" class="btn btn-success btn-sm" target="_blank"><i class="fa fa-file-text"></i> Kwitansi</a>
+						<h4 class="card-title"><i class="fa fa-home" style="color: var(--blue)"></i> {{ payment.rent.house.name }}</h4>
+						<p><i class="fa fa-user" style="color: var(--cyan)"></i> {{payment.rent.renter.get_full_name}} &rsaquo; <i class="fa fa-whatsapp" style="color: var(--green)"></i> {{payment.rent.renter.profile.phone}}</p>
+						{% with slug|add:"-"|add:payment.rent.renter.username|add:"-"|add:payment.rent.house.owner.username as slug %}
+						<a href="{% url 'kuitansi' slug %}" class="btn btn-success btn-sm" target="_blank"><i class="fa fa-file-text"></i> Kwitansi</a>
+						{% endwith %}
 				</div>
 			</div>
 		</div>
