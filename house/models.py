@@ -73,21 +73,7 @@ class Rent(models.Model):
 		self.deleted_at = timezone.now()
 		self.save()
 
-	def get_paid_rent(house_owner, year, month):
-		payment = Payment.objects.filter(
-			rent__house__owner=house_owner,
-			rent__active=True,
-			start__year=year,
-			start__month=month,
-		)
-
-		return Rent.objects.select_related('renter').filter(
-			house__owner=house_owner,
-			active=True,
-			id__in=payment.values_list('rent_id', flat=True)
-		)
-
-	def get_debt_rent(house_owner, year, month):
+	def get_debt(house_owner, year, month):
 		payment = Payment.objects.filter(
 			rent__house__owner=house_owner,
 			rent__active=True,
@@ -110,6 +96,22 @@ class Payment(models.Model):
 	def __str__(self):
 		return "%s/%s (%s)" % (self.rent.house.name, self.start, self.rent.renter)
 
+	def get_paid(house_owner, year, month):
+		return Payment.objects.select_related('rent').filter(
+			rent__house__owner=house_owner,
+			rent__active=True,
+			start__year=year,
+			start__month=month,
+		)
+
+	def kuitansi_obj(year, month, renter_username, owner_username):
+		return Payment.objects.select_related('rent__house__owner').get(
+			rent__house__owner__username=owner_username,
+			rent__renter__username=renter_username,
+			start__year=year,
+			start__month=month
+		)
+
 	def monthly_income(owner, year, month):
 		qs = Payment.objects.filter(
 			rent__house__owner=owner,
@@ -118,9 +120,6 @@ class Payment(models.Model):
 		).aggregate(models.Sum('nominal'))
 
 		return int(qs['nominal__sum'] or 0)
-
-	def kuitansi_obj(renter_username, year, month):
-		return Payment.objects.select_related('rent__house__owner').get(rent__renter__username=renter_username, start__year=year, start__month=month)
 
 class ExpenseType(models.Model):
 	name = models.CharField('Tipe Pengeluaran', max_length=50)

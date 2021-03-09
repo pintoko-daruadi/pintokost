@@ -90,12 +90,13 @@ class HouseUpdateView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMix
 
 class KuitansiView(DetailView):
 	model=Payment
-	pk_url_kwarg = 'renter'
 	template_name = 'house/kuitansi.html'
 
 	def get_object(self):
 		try:
-			return Payment.kuitansi_obj(self.kwargs.get('renter'), self.kwargs.get('year'), self.kwargs.get('month'))
+			slug = self.kwargs.get('slug')
+			slug = slug.split('-')
+			return Payment.kuitansi_obj(slug[0], slug[1], slug[2], slug[3])
 		except Exception as e:
 			raise Http404(e)
 
@@ -186,8 +187,8 @@ class RentPaymentView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
 		context['month'] = month
 		context['month_name'] = MONTHS[int(month)]
 		context['year'] = year
-		context['debt'] = Rent.get_debt_rent(self.request.user, year, month)
-		context['paid'] = Rent.get_paid_rent(self.request.user, year, month)
+		context['debt'] = Rent.get_debt(self.request.user, year, month)
+		context['paid'] = Payment.get_paid(self.request.user, year, month)
 		income = Payment.monthly_income(self.request.user, year, month)
 		context['income'] = toRupiah(income)
 		expense = Expense.monthly_outcome(self.request.user, year, month)
@@ -195,6 +196,7 @@ class RentPaymentView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
 		balance = income - expense
 		context['balance'] = toRupiah(balance)
 		context['balance_css_class'] = 'info' if balance > 0 else 'danger'
+		context['slug'] = str(year)+"-"+str(month)
 		return context
 
 	def form_valid(self, form):
