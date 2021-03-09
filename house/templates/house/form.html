@@ -18,20 +18,20 @@
 {% block javascript %}
 {{ form.media.js }}
 <script type="text/javascript">
-	$('#id_regency').on("select2:opening", function(e) {
-		if($('#id_province').val()==""){
+	$('.indoplacewidget[name="regency"]').on("select2:opening", function(e) {
+		if($('.indoplacewidget[name="province"]').val()==""){
 			alert('Pilih Provinsi terlebih dahulu')
 			return false;
 		}
 	});
-	$('#id_district').on("select2:opening", function(e) {
-		if($('#id_regency').val()==""){
+	$('.indoplacewidget[name="district"]').on("select2:opening", function(e) {
+		if($('.indoplacewidget[name="regency"]').val()==""){
 			alert('Pilih Kota/Kabupaten terlebih dahulu')
 			return false;
 		}
 	});
-	$('#id_village').on("select2:opening", function(e) {
-		if($('#id_district').val()==""){
+	$('.indoplacewidget[name="village"]').on("select2:opening", function(e) {
+		if($('.indoplacewidget[name="district"]').val()==""){
 			alert('Pilih Kecamatan terlebih dahulu')
 			return false;
 		}
