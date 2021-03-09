@@ -47,7 +47,9 @@
 			</div>
 		</div>
 	{% empty %}
+		{% if paid %}
 		<h5 style="color: teal"><i>Wah, sepertinya semua pembayaran sudah selesai</i> <span class="fa fa-child" style="color: orange"></span></h5>
+		{% endif %}
 	{% endfor %}
 {% endblock %}
 
