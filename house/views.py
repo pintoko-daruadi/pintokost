@@ -1,4 +1,4 @@
-from django.db.models import Sum
+from django.db.models import F, Sum
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib import messages
@@ -188,7 +188,9 @@ class RentPaymentView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
 		context['month_name'] = MONTHS[int(month)]
 		context['year'] = year
 		context['debt'] = Rent.get_debt(self.request.user, year, month)
-		context['paid'] = Payment.get_paid(self.request.user, year, month)
+		context['paid'] = Payment.get_paid(self.request.user, year, month).filter(rent__price__gte=F('paid_nominal'))
+		for p in context['paid']:
+			print(p)
 		income = Payment.monthly_income(self.request.user, year, month)
 		context['income'] = toRupiah(income)
 		expense = Expense.monthly_outcome(self.request.user, year, month)

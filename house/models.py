@@ -74,18 +74,11 @@ class Rent(models.Model):
 		self.save()
 
 	def get_debt(house_owner, year, month):
-		payment = Payment.objects.filter(
-			rent__house__owner=house_owner,
-			rent__active=True,
-			start__year=year,
-			start__month=month,
-		)
-
-		return Rent.objects.select_related('renter').filter(
+		return Rent.objects.select_related('renter').prefetch_related(models.Prefetch('payment_set', queryset=Payment.get_paid(house_owner, year, month))).filter(
 			house__owner=house_owner,
 			active=True,
 			start_date__lte=datetime.date(int(year), int(month), 15), #ambil pengontrak yg mulai dibawah tanggal 15
-		).exclude(id__in=payment.values_list('rent_id', flat=True))
+		).exclude(id__in=Payment.get_paid(house_owner, year, month).filter(rent__price=models.F('paid_nominal')).values_list('rent_id', flat=True))
 
 class Payment(models.Model):
 	rent = models.ForeignKey(Rent, on_delete=models.PROTECT)
@@ -97,7 +90,7 @@ class Payment(models.Model):
 		return "%s/%s (%s)" % (self.rent.house.name, self.start, self.rent.renter)
 
 	def get_paid(house_owner, year, month):
-		return Payment.objects.select_related('rent').filter(
+		return Payment.objects.select_related('rent').annotate(paid_nominal=models.Sum('nominal')).filter(
 			rent__house__owner=house_owner,
 			rent__active=True,
 			start__year=year,
