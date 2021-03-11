@@ -95,7 +95,6 @@ class Payment(models.Model):
 	nominal = models.DecimalField(max_digits=12, default=0, decimal_places=2, verbose_name='Harga')
 	pay_date = models.DateField('Tanggal Bayar', default=None, help_text='Format: YYYY-MM-DD')
 	start = models.DateField('Mulai Sewa', default=None, help_text='Format: YYYY-MM-DD')
-	objects = PaymentManager()
 
 	def __str__(self):
 		return "%s/%s (%s)" % (self.rent.house.name, self.start, self.rent.renter)
