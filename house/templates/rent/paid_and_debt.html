@@ -22,10 +22,11 @@
 		<div class="row">
 			<div class="col-sm-8">
 				<div class="card-block">
-						<h4 class="card-title"><i class="fa fa-home" style="color: var(--blue)"></i> {{ payment.rent.house.name }}</h4>
+						<h4 class="card-title"><i class="fa fa-home" style="color: var(--blue)"></i> {{ payment.rent.house.name }} <span style="font-size: medium;">({{payment.pay_date}})</span></h4>
 						<p><i class="fa fa-user" style="color: var(--cyan)"></i> {{payment.rent.renter.get_full_name}} &rsaquo; <i class="fa fa-whatsapp" style="color: var(--green)"></i> {{payment.rent.renter.profile.phone}}</p>
+						<p><i class="fa fa-tag" style="color: var(--teal)"></i> {{payment.nominal_rp}}</p>
 						{% with slug|add:"-"|add:payment.rent.renter.username|add:"-"|add:payment.rent.house.owner.username as slug %}
-						<a href="{% url 'kuitansi' slug %}" class="btn btn-success btn-sm" target="_blank"><i class="fa fa-file-text"></i> Kwitansi</a>
+						<a href="{% url 'kuitansi' payment.id slug %}" class="btn btn-success btn-sm" target="_blank"><i class="fa fa-file-text"></i> Kwitansi</a>
 						{% endwith %}
 				</div>
 			</div>
@@ -40,16 +41,18 @@
   <h5 class="font-weight-bold">Piutang</h5>
   {% endif %}
 	{% for rent in debt %}
-		<div class="row">
-			<div class="col-sm-8">
-				<div class="card-block">
-						<h4 class="card-title"><i class="fa fa-home" style="color: var(--blue)"></i> {{ rent.house.name }}</h4>
-						<p><i class="fa fa-user" style="color: var(--cyan)"></i> {{rent.renter.get_full_name}} &rsaquo; <i class="fa fa-whatsapp" style="color: var(--green)"></i> {{rent.renter.profile.phone}}</p>
-						{{rent.payment_set.all|remain:rent.price}}
-						<a href="{% url 'house:pay' rent.id form.year.value form.month.value %}" class="btn btn-warning btn-sm"><i class="fa fa-plus-circle"></i> Catat</a>
+		{% ifnotequal rent.get_sum_payment.sum_payment rent.price %}
+			<div class="row">
+				<div class="col-sm-8">
+					<div class="card-block">
+							<h4 class="card-title"><i class="fa fa-home" style="color: var(--blue)"></i> {{ rent.house.name }}</h4>
+							<p><i class="fa fa-user" style="color: var(--cyan)"></i> {{rent.renter.get_full_name}} &rsaquo; <i class="fa fa-whatsapp" style="color: var(--green)"></i> {{rent.renter.profile.phone}}</p>
+							{{rent.payment_set.all|remain:rent.price}}
+							<a href="{% url 'house:pay' rent.id form.year.value form.month.value %}" class="btn btn-warning btn-sm"><i class="fa fa-plus-circle"></i> Catat</a>
+					</div>
 				</div>
 			</div>
-		</div>
+		{% endifnotequal %}
 	{% empty %}
 		{% if paid %}
 		<h5 style="color: teal"><i>Wah, sepertinya semua pembayaran sudah selesai</i> <span class="fa fa-child" style="color: orange"></span></h5>
