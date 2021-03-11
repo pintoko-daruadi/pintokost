@@ -94,9 +94,10 @@ class KuitansiView(DetailView):
 
 	def get_object(self):
 		try:
+			pk = self.kwargs.get('pk')
 			slug = self.kwargs.get('slug')
 			slug = slug.split('-')
-			return Payment.kuitansi_obj(slug[0], slug[1], slug[2], slug[3])
+			return Payment.kuitansi_obj(pk, slug[0], slug[1], slug[2], slug[3])
 		except Exception as e:
 			raise Http404(e)
 
@@ -104,6 +105,7 @@ class KuitansiView(DetailView):
 		context = super().get_context_data()
 		context['month_name'] = MONTHS[int(self.get_object().start.month)]
 		context['nominal'] = toRupiah(self.get_object().nominal)
+		context['price'] = toRupiah(self.get_object().rent.price)
 		return context
 
 class PaymentCreateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView):
