@@ -41,7 +41,7 @@
   <h5 class="font-weight-bold">Piutang</h5>
   {% endif %}
 	{% for rent in debt %}
-		{% ifnotequal rent.get_sum_payment.sum_payment rent.price %}
+		{% if rent.show_debt %}
 			<div class="row">
 				<div class="col-sm-8">
 					<div class="card-block">
@@ -52,7 +52,7 @@
 					</div>
 				</div>
 			</div>
-		{% endifnotequal %}
+		{% endif %}
 	{% empty %}
 		{% if paid %}
 		<h5 style="color: teal"><i>Wah, sepertinya semua pembayaran sudah selesai</i> <span class="fa fa-child" style="color: orange"></span></h5>

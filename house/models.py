@@ -79,16 +79,21 @@ class Rent(models.Model):
 				rent__id=self.id,
 				start__year=self.payment_set.first().start.year,
 				start__month=self.payment_set.first().start.month
-			)
+			)['sum_payment']
 		else:
-			return 0
+			from decimal import Decimal
+			return Decimal('0')
+
+	def show_debt(self):
+		return (self.get_sum_payment() < self.price)
 
 	def get_debt(house_owner, year, month):
-		return Rent.objects.prefetch_related(models.Prefetch('payment_set', queryset=Payment.get_paid(house_owner, year, month))).filter(
+		paid = Payment.get_paid(house_owner, year, month)
+		return Rent.objects.prefetch_related(models.Prefetch('payment_set', queryset=paid)).filter(
 			house__owner=house_owner,
 			active=True,
 			start_date__lte=datetime.date(int(year), int(month), 15), #ambil pengontrak yg mulai dibawah tanggal 15
-		).exclude(id__in=Payment.get_paid(house_owner, year, month).values_list('rent_id', flat=True))
+		).exclude(id__in=paid.annotate(sum_payment=models.Sum('nominal')).filter(sum_payment=models.F('rent__price')).values_list('rent_id', flat=True))
 
 class Payment(models.Model):
 	rent = models.ForeignKey(Rent, on_delete=models.PROTECT)
