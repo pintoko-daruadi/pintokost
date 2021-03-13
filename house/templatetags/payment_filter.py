@@ -1,8 +1,9 @@
 from django import template
-from house.helpers import toRupiah
-register = template.Library()
-from django.utils.safestring import mark_safe
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
+from house.helpers import toRupiah
+
+register = template.Library()
 
 @register.filter(name='remain')
 def remain(payment, price):
