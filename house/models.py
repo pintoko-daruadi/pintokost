@@ -105,7 +105,7 @@ class Payment(models.Model):
 		return "%s/%s (%s)" % (self.rent.house.name, self.start, self.rent.renter)
 
 	def get_paid(house_owner, year, month):
-		return Payment.objects.filter(
+		return Payment.objects.select_related('rent').filter(
 			rent__house__owner=house_owner,
 			rent__active=True,
 			start__year=year,
