@@ -73,19 +73,27 @@ class Rent(models.Model):
 		self.deleted_at = timezone.now()
 		self.save()
 
-	def get_debt(house_owner, year, month):
-		payment = Payment.objects.filter(
-			rent__house__owner=house_owner,
-			rent__active=True,
-			start__year=year,
-			start__month=month,
-		)
+	def get_sum_payment(self):
+		if self.payment_set.count() > 0:
+			return Payment.objects.values('rent').annotate(sum_payment=models.Sum('nominal')).get(
+				rent__id=self.id,
+				start__year=self.payment_set.first().start.year,
+				start__month=self.payment_set.first().start.month
+			)['sum_payment']
+		else:
+			from decimal import Decimal
+			return Decimal('0')
 
-		return Rent.objects.select_related('renter').filter(
+	def show_debt(self):
+		return (self.get_sum_payment() < self.price)
+
+	def get_debt(house_owner, year, month):
+		paid = Payment.get_paid(house_owner, year, month)
+		return Rent.objects.prefetch_related(models.Prefetch('payment_set', queryset=paid)).filter(
 			house__owner=house_owner,
 			active=True,
 			start_date__lte=datetime.date(int(year), int(month), 15), #ambil pengontrak yg mulai dibawah tanggal 15
-		).exclude(id__in=payment.values_list('rent_id', flat=True))
+		).exclude(id__in=paid.annotate(sum_payment=models.Sum('nominal')).filter(sum_payment=models.F('rent__price')).values_list('rent_id', flat=True))
 
 class Payment(models.Model):
 	rent = models.ForeignKey(Rent, on_delete=models.PROTECT)
@@ -104,8 +112,9 @@ class Payment(models.Model):
 			start__month=month,
 		)
 
-	def kuitansi_obj(year, month, renter_username, owner_username):
+	def kuitansi_obj(pk, year, month, renter_username, owner_username):
 		return Payment.objects.select_related('rent__house__owner').get(
+			id = pk,
 			rent__house__owner__username=owner_username,
 			rent__renter__username=renter_username,
 			start__year=year,
@@ -120,6 +129,9 @@ class Payment(models.Model):
 		).aggregate(models.Sum('nominal'))
 
 		return int(qs['nominal__sum'] or 0)
+
+	def nominal_rp(self):
+		return toRupiah(self.nominal)
 
 class ExpenseType(models.Model):
 	name = models.CharField('Tipe Pengeluaran', max_length=50)
