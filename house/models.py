@@ -59,7 +59,7 @@ class Rent(models.Model):
 		limit_choices_to={'groups__name': 'renter'}
 	)
 	house = models.ForeignKey(House, on_delete=models.PROTECT, verbose_name='Rumah')
-	price = models.DecimalField(max_digits=12, decimal_places=0, verbose_name='Harga')
+	price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name='Harga')
 	billing_date = models.DateField('Tanggal Tagihan', default=None)
 	active = models.BooleanField('Status Sewa', default=True)
 	start_date = models.DateField("Awal Masuk", default=datetime.date.today, help_text='Format: YYYY-MM-DD')
