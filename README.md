@@ -1,4 +1,4 @@
-# pintokost - Rental House Application
+# Rental House Application
 
 Web application to record the transaction of rental house created in Python Django.
 Features:
