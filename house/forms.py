@@ -53,8 +53,9 @@ class HouseForm(forms.ModelForm):
 
 class PaymentListForm(forms.Form):
 	START_YEAR = 2021
-	years = [(x, str(x)) for x in range(START_YEAR, (date.today().year+1))]
-	year = forms.ChoiceField(choices=years)
+	year_range = reversed(range(START_YEAR, date.today().year+1))
+	year_tuple = [(x, str(x)) for x in year_range]
+	year = forms.ChoiceField(choices=year_tuple)
 
 	months = [(x, MONTHS[x]) for x in range(1, 13)]
 	month = forms.ChoiceField(choices=months)
