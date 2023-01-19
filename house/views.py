@@ -207,12 +207,12 @@ class RentPaymentView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
 	def get_context_data(self, **kwargs):
 		context = super(RentPaymentView, self).get_context_data(**kwargs)
 		today = date.today()
-		context = self.build_data_context(context,today.year, today.month)
+		context = self.build_data_context(context, today.year, today.month)
 		return context
 
 	def get_initial(self):
 		return {
-			'year': PaymentListForm.START_YEAR,
+			'year': date.today().year,
 			'month': date.today().month,
 		}
 
