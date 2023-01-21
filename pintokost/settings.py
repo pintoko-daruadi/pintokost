@@ -89,9 +89,17 @@ TEMPLATES = [
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': os.path.join(BASE_DIR, SECRETS['DB_NAME']),
+    # }
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, SECRETS['DB_NAME']),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': SECRETS['DB_NAME'],
+        'USER': SECRETS['DB_USER'],
+        'PASSWORD': SECRETS['DB_PASS'],
+        'HOST': SECRETS['DB_HOST'],
+        'PORT': SECRETS['DB_PORT']
     }
 }
 
@@ -158,3 +166,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 SELECT2_CACHE_BACKEND = "select2"
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

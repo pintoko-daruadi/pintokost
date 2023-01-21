@@ -33,7 +33,6 @@ class District(models.Model):
         return self.name
 
 class Village(models.Model):
-    id = models.PositiveIntegerField('ID', primary_key=True)
     district = models.ForeignKey(District, on_delete=models.PROTECT)
     name = models.CharField('Nama', max_length=50)
 
