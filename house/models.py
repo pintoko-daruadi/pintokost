@@ -18,7 +18,7 @@ def house_dir(instance, filename):
 class House(models.Model):
 	name = models.CharField('Nama', max_length=50)
 	address = models.CharField('Alamat', max_length=300)
-	pln_number = models.CharField('Nomor PLN', max_length=20)
+	pln_number = models.CharField('Nomor PLN', max_length=20, blank=True)
 	active = models.BooleanField(default=True)
 	deleted_at = models.DateTimeField(blank=True, null=True)
 	owner = models.ForeignKey(

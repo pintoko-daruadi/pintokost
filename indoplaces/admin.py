@@ -4,4 +4,7 @@ from .models import Province, Regency, District, Village
 admin.site.register(Province)
 admin.site.register(Regency)
 admin.site.register(District)
-admin.site.register(Village)
+
+@admin.register(Village)
+class VillageAdmin(admin.ModelAdmin):
+    search_fields = ['name']

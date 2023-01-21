@@ -1,0 +1,18 @@
+version: '3.1'
+
+services:
+  db:
+    image: mariadb:10.3
+    container_name: mariadb
+    environment:
+      MARIADB_ROOT_PASSWORD: pintokost_password
+      MARIADB_USER: pintoko
+      MARIADB_PASSWORD: pintokost_password
+      MARIADB_DATABASE: pintokost
+    ports:
+      - "3306:3306"
+  cache:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"

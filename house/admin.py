@@ -66,15 +66,13 @@ admin.site.register(Expense, ExpenseAdmin)
 class HouseAdmin(admin.ModelAdmin):
 	list_display = ('name', 'pln_number', 'address', 'owner', 'active')
 	ordering = ('name',)
-	autocomplete_fields = ['owner']
+	autocomplete_fields = ['owner', 'village']
 
 	def get_form(self, request, obj=None, **kwargs):
-		if not request.user.is_superuser:
-			if request.user.groups.filter(name='owner').count() > 0:
-				self.readonly_fields = ('owner',)
-		else:
-			self.readonly_fields = ('village',)
 		form = super().get_form(request, obj, **kwargs)
+		if request.user.groups.filter(name='owner').count() > 0:
+			form.base_fields['owner'].queryset = User.objects.filter(username=request.user.username)
+			form.base_fields['owner'].initial = request.user
 		return form
 
 	def get_queryset(self, request):
@@ -82,7 +80,6 @@ class HouseAdmin(admin.ModelAdmin):
 		if request.user.is_superuser:
 			return qs
 		return qs.filter(owner = request.user)
-
 admin.site.register(House, HouseAdmin)
 
 class YearListFilter(admin.SimpleListFilter):

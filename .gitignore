@@ -7,3 +7,4 @@ media.zip
 *.pyc
 static/*
 secrets*.json
+deploy.zip
