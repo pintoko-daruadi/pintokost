@@ -1,8 +1,8 @@
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from django.db import models
-from django.contrib.admin.models import User
+from django.contrib.auth.models import User
 
-from house.models import House, Payment
+from house.models import House
 from pintokost.helpers import toRupiah
 
 class Rent(models.Model):
@@ -15,7 +15,7 @@ class Rent(models.Model):
 	price = models.DecimalField(max_digits=12, decimal_places=2)
 	billing_date = models.DateField(default=None)
 	active = models.BooleanField(default=True)
-	start_date = models.DateField(default=datetime.date.today, help_text='Format: YYYY-MM-DD')
+	start_date = models.DateField(default=date.today(), help_text='Format: YYYY-MM-DD')
 	deleted_at = models.DateTimeField(blank=True, null=True)
 
 	def __str__(self):

@@ -1,4 +1,4 @@
-from .models import House, Rent
+from .models import House
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.urls import reverse_lazy
 

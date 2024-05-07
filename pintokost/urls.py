@@ -19,12 +19,13 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 from house import views as house_views
+from payment.views import KuitansiView
 
 urlpatterns = [
     path('', house_views.index),
     path('admin/', admin.site.urls),
     path('house/', include('house.urls', namespace='house')),
-    path('k/<int:pk>/<str:slug>', house_views.KuitansiView.as_view(), name='kuitansi'),
+    path('k/<int:pk>/<str:slug>', KuitansiView.as_view(), name='kuitansi'),
     path('login/', auth_views.LoginView.as_view(template_name='house/login.html', redirect_authenticated_user=True), name='login'),
     path('logout/', auth_views.logout_then_login, name='logout'),
     path('profile/', include('profile.urls', namespace='profile')),
