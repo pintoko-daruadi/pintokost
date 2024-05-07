@@ -2,8 +2,9 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe
 from django.utils.dates import MONTHS
 from datetime import date
+
+from expense.models import Expense, ExpenseType
 from .models import *
-from .helpers import *
 from profile.models import Profile
 
 class ExpenseListByMonthFilter(admin.SimpleListFilter):

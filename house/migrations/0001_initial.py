@@ -4,7 +4,7 @@ import datetime
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import houses.models
+import house.models
 
 
 class Migration(migrations.Migration):
@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 ('pln_number', models.CharField(blank=True, max_length=20, verbose_name='Nomor PLN')),
                 ('active', models.BooleanField(default=True)),
                 ('deleted_at', models.DateTimeField(blank=True, null=True)),
-                ('image', models.ImageField(blank=True, null=True, upload_to=houses.models.house_dir)),
+                ('image', models.ImageField(blank=True, null=True, upload_to=house.models.house_dir)),
                 ('owner', models.ForeignKey(limit_choices_to={'groups__name': 'owner'}, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
                 ('village', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='indoplaces.village')),
             ],
@@ -69,7 +69,7 @@ class Migration(migrations.Migration):
                 ('nominal', models.PositiveIntegerField(verbose_name='Biaya Pengeluaran')),
                 ('date', models.DateField(verbose_name='Tanggal')),
                 ('remark', models.CharField(max_length=200, verbose_name='Catatan')),
-                ('receipt_photo', models.FileField(blank=True, null=True, upload_to=houses.models.expense_path)),
+                ('receipt_photo', models.FileField(blank=True, null=True, upload_to=house.models.expense_path)),
                 ('expense_type', models.ForeignKey(default=1, on_delete=django.db.models.deletion.PROTECT, to='house.expensetype')),
                 ('house', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='house.house')),
             ],

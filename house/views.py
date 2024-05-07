@@ -10,10 +10,11 @@ from django.views.generic import TemplateView, DetailView
 from django.views.generic.edit import CreateView, FormView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 from datetime import date
+
+from pintokost.helpers import toRupiah
 from .forms import PaymentListForm, RentForm, HouseForm
 from .mixins import HouseOwnerMixin, HouseRentedMixin
 from .models import Payment, Rent, Expense, House
-from .helpers import toRupiah
 
 def index(request):
 	return redirect(reverse_lazy('house:payment_list'))
@@ -141,8 +142,8 @@ class RentCreateView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMixi
 	house = None
 	form_class = RentForm
 	model = Rent
-	permission_required = 'houses.add_rent'
-	success_url = reverse_lazy('houses:list')
+	permission_required = 'house.add_rent'
+	success_url = reverse_lazy('house:list')
 	template_name = 'rent/form.html'
 
 	def get_initial(self):
@@ -166,9 +167,9 @@ class RentCreateView(LoginRequiredMixin, PermissionRequiredMixin, HouseOwnerMixi
 
 class RentDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
 	model = Rent
-	permission_required = 'houses.change_rent'
+	permission_required = 'house.change_rent'
 	success_message = "Sewa Rumah berhasil dihapus"
-	success_url = reverse_lazy('houses:list')
+	success_url = reverse_lazy('house:list')
 	template_name = 'rent/delete.html'
 
 	def delete(self, request, *args, **kwargs):
@@ -179,7 +180,7 @@ class RentDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
 
 class RentPaymentView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
 	form_class = PaymentListForm
-	permission_required = 'houses.view_rent'
+	permission_required = 'house.view_rent'
 	template_name = 'rent/paid_and_debt.html'
 
 	def build_data_context(self, context, year, month):
@@ -217,4 +218,4 @@ class RentPaymentView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
 		}
 
 class ThanksView(LoginRequiredMixin, TemplateView):
-	template_name = 'houses/thanks.html'
+	template_name = 'house/thanks.html'

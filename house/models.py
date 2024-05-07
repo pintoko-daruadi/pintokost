@@ -1,24 +1,18 @@
 from django.conf import settings
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
-from .helpers import toRupiah
-from indoplaces.models import Village
-import datetime, re, os
+import datetime
 
-def expense_path(instance, filename):
-	basefilename, file_extension= os.path.splitext(filename)
-	new_filename = "{}_{}" % (instance.house, instance.expense_type)
-	new_filename = re.sub('[^A-Za-z]', '_', new_filename)
-	return 'expense/%Y/%m/%d/{filename}{ext}'.format(filename=new_filename, ext= file_extension)
+from pintokost.helpers import resize_image, toRupiah
 
 def house_dir(instance, filename):
 	return "house/{0}/{1}".format(instance.owner.username, filename)
 
 class House(models.Model):
-	name = models.CharField('Nama', max_length=50)
-	address = models.CharField('Alamat', max_length=300)
-	pln_number = models.CharField('Nomor PLN', max_length=20, blank=True)
+	name = models.CharField(max_length=50)
+	address = models.CharField(max_length=300)
+	pln_number = models.CharField('Nomor listrik PLN', max_length=20, blank=True)
 	active = models.BooleanField(default=True)
 	deleted_at = models.DateTimeField(blank=True, null=True)
 	owner = models.ForeignKey(
@@ -27,7 +21,6 @@ class House(models.Model):
 		limit_choices_to={'groups__name': 'owner'}
 	)
 	image = models.ImageField(null=True, blank=True, upload_to=house_dir)
-	village = models.ForeignKey(Village, on_delete=models.SET_NULL, null=True)
 
 	def __str__(self):
 		return self.name
@@ -40,7 +33,6 @@ class House(models.Model):
 		return static('default.jpg')
 
 	def save(self):
-		from .helpers import resize_image
 		if self.image:
 			self.image = resize_image(self.image)
 
@@ -55,14 +47,13 @@ class Rent(models.Model):
 	renter = models.ForeignKey(
 		User,
 		on_delete=models.PROTECT,
-		verbose_name='Penyewa',
 		limit_choices_to={'groups__name': 'renter'}
 	)
-	house = models.ForeignKey(House, on_delete=models.PROTECT, verbose_name='Rumah')
-	price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name='Harga')
-	billing_date = models.DateField('Tanggal Tagihan', default=None)
-	active = models.BooleanField('Status Sewa', default=True)
-	start_date = models.DateField("Awal Masuk", default=datetime.date.today, help_text='Format: YYYY-MM-DD')
+	house = models.ForeignKey(House, on_delete=models.PROTECT)
+	price = models.DecimalField(max_digits=12, decimal_places=2)
+	billing_date = models.DateField(default=None)
+	active = models.BooleanField(default=True)
+	start_date = models.DateField(default=datetime.date.today, help_text='Format: YYYY-MM-DD')
 	deleted_at = models.DateTimeField(blank=True, null=True)
 
 	def __str__(self):
@@ -130,36 +121,5 @@ class Payment(models.Model):
 
 		return int(qs['nominal__sum'] or 0)
 
-	def nominal_rp(self):
+	def nominal_in_rupiah(self):
 		return toRupiah(self.nominal)
-
-class ExpenseType(models.Model):
-	name = models.CharField('Tipe Pengeluaran', max_length=50)
-	owner = models.ForeignKey(
-		User,
-		on_delete=models.PROTECT,
-		verbose_name='Pemilik Rumah',
-		limit_choices_to={'groups__name': 'owner'}
-	)
-	def __str__(self):
-		return self.name
-
-class Expense(models.Model):
-	house = models.ForeignKey(House, on_delete=models.PROTECT)
-	nominal = models.PositiveIntegerField('Biaya Pengeluaran')
-	date = models.DateField('Tanggal')
-	expense_type = models.ForeignKey(ExpenseType, on_delete=models.PROTECT, default=1)
-	remark = models.CharField('Catatan', max_length=200)
-	receipt_photo = models.FileField(blank=True, null=True, upload_to=expense_path)
-
-	def __str__(self):
-		return "%s <%s> (%s)" % (self.expense_type, toRupiah(self.nominal), self.house)
-
-	def monthly_outcome(owner, year, month):
-		qs = Expense.objects.filter(
-			house__owner=owner,
-			date__year=year,
-			date__month=month,
-		).aggregate(models.Sum('nominal'))
-
-		return int(qs['nominal__sum'] or 0)

@@ -4,51 +4,18 @@ from django import forms
 from django.utils.dates import MONTHS
 from datetime import date
 from .models import House, Rent
-from indoplaces.models import Province, Regency, District, Village
-from houses.forms_widgets import RenterWidget, IndoPlaceWidget
+from house.forms_widgets import RenterWidget, IndoPlaceWidget
 
 class HouseForm(forms.ModelForm):
-	province = forms.ModelChoiceField(
-		label='Provinsi',
-		required=False,
-		queryset=Province.objects.all(),
-		widget=IndoPlaceWidget(
-			model=Province,
-		)
-	)
-	regency = forms.ModelChoiceField(
-		label='Kota/Kabupaten',
-		required=False,
-		queryset=Regency.objects.all(),
-		widget=IndoPlaceWidget(
-			model=Regency,
-			dependent_fields={'province': 'province'},
-		),
-	)
-	district = forms.ModelChoiceField(
-		label='Kecamatan',
-		required=False,
-		queryset=District.objects.all(),
-		widget=IndoPlaceWidget(
-			model=District,
-			dependent_fields={'regency': 'regency'},
-		),
-	)
-
 	class Meta:
 		model = House
-		fields = ['name', 'province', 'regency', 'district', 'village', 'address', 'pln_number', 'image']
+		fields = ['name', 'address', 'pln_number', 'image']
 		widgets = {
 			'address': forms.Textarea(),
-			'village': IndoPlaceWidget(
-				queryset=Village.objects.all(),
-				dependent_fields={'district': 'district'},
-			),
 		}
 		labels = {
 			'name': 'Nama Rumah',
 			'address': 'Alamat Lengkap',
-			'village': 'Kelurahan/Desa',
 		}
 
 class PaymentListForm(forms.Form):
