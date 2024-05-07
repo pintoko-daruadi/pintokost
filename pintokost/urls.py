@@ -18,14 +18,14 @@ from django.contrib.auth import views as auth_views
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
-from houses import views as houses_views
+from house import views as house_views
 
 urlpatterns = [
-    path('', houses_views.index),
+    path('', house_views.index),
     path('admin/', admin.site.urls),
-    path('houses/', include('houses.urls', namespace='houses')),
-    path('k/<int:pk>/<str:slug>', houses_views.KuitansiView.as_view(), name='kuitansi'),
-    path('login/', auth_views.LoginView.as_view(template_name='houses/login.html', redirect_authenticated_user=True), name='login'),
+    path('house/', include('house.urls', namespace='house')),
+    path('k/<int:pk>/<str:slug>', house_views.KuitansiView.as_view(), name='kuitansi'),
+    path('login/', auth_views.LoginView.as_view(template_name='house/login.html', redirect_authenticated_user=True), name='login'),
     path('logout/', auth_views.logout_then_login, name='logout'),
     path('profile/', include('profile.urls', namespace='profile')),
     path("select2/", include("django_select2.urls")),

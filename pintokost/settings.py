@@ -45,9 +45,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_select2',
     'crispy_forms',
-    'houses',
+    'house',
+    'expense',
     'profile',
-    'indoplaces',
     'django_cleanup.apps.CleanupConfig',
 ]
 
