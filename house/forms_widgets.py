@@ -17,7 +17,7 @@ class RenterWidget(s2forms.ModelSelect2Widget):
 
 class IndoPlaceWidget(s2forms.ModelSelect2Widget):
 	search_fields = ['name__icontains']
-	max_results = 2
+	max_results = 3
 
 	def build_attrs(self, base_attrs, extra_attrs):
-		return super().build_attrs(base_attrs, extra_attrs={"data-minimum-input-length": 4})
+		return super().build_attrs(base_attrs, extra_attrs={"data-minimum-input-length": 2})

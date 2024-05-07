@@ -5,7 +5,7 @@ from django.utils.dates import MONTHS
 from datetime import date
 from .models import House, Rent
 from indoplaces.models import Province, Regency, District, Village
-from house.forms_widgets import RenterWidget, IndoPlaceWidget
+from houses.forms_widgets import RenterWidget, IndoPlaceWidget
 
 class HouseForm(forms.ModelForm):
 	province = forms.ModelChoiceField(
