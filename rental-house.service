@@ -1,5 +1,5 @@
 [Unit]
-Description=Service for running uwsgi of Pintokost
+Description=Service for running uwsgi of rental-house
 Requires=network.target
 After=network.target
 
