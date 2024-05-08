@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     'expense',
     'profile',
     'rent',
-    'payment',
     'django_cleanup.apps.CleanupConfig',
 ]
 
