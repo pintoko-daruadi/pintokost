@@ -12,7 +12,7 @@
 	</head>
 	<body>
 		<nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
-			<a class="navbar-brand" href="/">DaruSinau</a>
+			<a class="navbar-brand" href="/">Atur Kos</a>
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
 			</button>
@@ -28,7 +28,7 @@
 
 					{% if perms.house.add_house %}
 					<li class="nav-item {% if menu_house %}active{% endif %}">
-						<a class="nav-link" href="{% url 'house:list' %}"><i class="fa fa-building"></i> Bangunan</a>
+						<a class="nav-link" href="{% url 'house:list' %}"><i class="fa fa-building"></i> Properti</a>
 					</li>
 					{% endif %}
 
@@ -42,15 +42,27 @@
 					<a href="{% url 'logout' %}" class="nav-link"><i class="fa fa-sign-out"></i> Keluar</a>
 				</div>
 			</div>
+			{% else %}
+			<div class="collapse navbar-collapse" id="navbarColor01">
+				<ul class="navbar-nav mr-auto">
+					<li class="nav-item">
+						<a class="nav-link" href="https://haven.darusinau.com"><i class="fa fa-building"></i> Haven DaruSinau</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="https://darusinau.com"><i class="fa fa-bolt"></i> Blog DaruSinau</a>
+					</li>
+				</ul>
+			</div>
 			{% endif %}
 		</nav>
 		<div class="container">
 			<div class="row">
-				<div class="col-sm-8 order-2 order-md-1 mb-3">
+				<div class="col-12 col-md-8 order-md-first">
 					{% block pagecontent %}
 					{% endblock %}
 				</div>
-				<div class="col-sm-4 order-1 order-md-2">
+				
+				<div class="col-12 col-md-4 order-first">
 					{% block sidecontent %}
 					{% endblock %}
 				</div>

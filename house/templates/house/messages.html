@@ -1,0 +1,11 @@
+{% load messages_filter %}
+{% if messages %}
+<div class="row">
+    <div class="col-12">
+    {% for message in messages %}
+    <div class="alert alert-{% if message.tags %}{{ message.tags|alert_bootstrap }} {% endif %}"> {{ message }} </div>
+    {% endfor %}
+    </div>
+</div>
+<hr class="my-2"/>
+{% endif %}

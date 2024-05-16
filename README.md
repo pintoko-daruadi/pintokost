@@ -11,6 +11,6 @@ Features:
 
 ## TODO
 - Create webview (Android app)
-- New building owner can self register
+- New building owner can cls register
 
 if you have any question about this app or if you want to request some new feature, you can contact me at [@mdaruadi](https://twitter.com/mdaruadi)

@@ -1,0 +1,79 @@
+{% extends 'house/base.html' %}
+{% load payment_filter %}
+
+{% block title %}Daftar rumah{% endblock %}
+
+{% block pagecontent %}
+    <p class="lead">Daftar Properti</p>
+    {% if houses %}
+    {% for house in houses %}
+    <div class="card mb-2">
+        <div class="card-body">
+          <h5 class="card-title">{{house.name}}</h5>
+          {% if house.is_currently_rented %}
+            <p class="card-text">
+                <p><i class="fa fa-user-circle"></i> {{house.get_current_rent.renter.first_name}} &nbsp; <span class="badge badge-pill badge-info"><i class="fa fa-phone"></i> {{house.get_current_rent.renter.profile.phone}}</span></p>
+            </p>
+            {% is_paid house "2024" "5" as paid %}
+            {% if paid  %}
+            <a href="#" class="btn btn-success" disabled><i class="fa fa-check-circle-o" aria-hidden="true"></i> Sudah bayar</a>
+            {% else %}
+            <a href="#" class="btn btn-primary"><i class="fa fa-money" aria-hidden="true"></i> Tandai sudah bayar</a>
+            <a href="#" class="btn btn-warning"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> Kirim Tagihan</a>
+            {% endif %}
+          {% else %}
+            <p><i class="text-danger fa fa-minus-circle"></i> Sedang kosong</p>
+            <a href="#" class="btn btn-primary"><i class="fa fa-cog" aria-hidden="true"></i> Atur Penyewa</a>
+          {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p class="lead">masih kosong</p>
+    {% endif %}
+{% endblock pagecontent %}
+{% block sidecontent %}
+<div class="row">
+    <div class="col-12">
+        <small>Pilih bulan dan tahun untuk cek status pembayaran</small>
+    </div>
+</div>
+<div class="row">
+        <div class="dropdown col-4">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Tahun
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" href="#">2024</a>
+            </div>
+        </div>
+        <div class="dropdown col-4">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Bulan
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" href="#">Januari</a>
+              <a class="dropdown-item" href="#">Februari</a>
+              <a class="dropdown-item" href="#">Maret</a>
+              <a class="dropdown-item" href="#">April</a>
+              <a class="dropdown-item" href="#">Mei</a>
+            </div>
+        </div>
+        <button type="button" class="btn btn-info">
+            <i class="fa fa-search"></i> Cari
+        </button>
+</div>
+<hr class="my-2"/>
+<div class="row">
+    <div class="col-12">
+        <small>Untuk menambah rumah baru, klik tombol di bawah ini</small>
+    </div>
+</div>
+<div class="row mb-2">
+    <div class="col-12">
+        <a href="{% url 'house:add' %}" class="col-12 btn btn-primary"><i class="fa fa-plus"></i> Tambah rumah baru </a>
+    </div>
+</div>
+<hr class="my-2"/>
+{% include 'house/messages.html' %}
+{% endblock sidecontent %}
